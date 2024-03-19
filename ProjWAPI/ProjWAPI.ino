@@ -4,27 +4,62 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <TimeLib.h>
-
 #include "DHT20.h"
+#include "esp_secrets.h"
+
+
+// Configuração da rede Wi-Fi
+const char* ssid = SECRET_SSID;
+const char* password = SECRET_PASS;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+WiFiUDP ntpUDP;
+  NTPClient timeClient(ntpUDP);
+
 
 DHT20 DHT;
 
 uint8_t count = 0;
 const int ldrPin = 34;       // pin 34
 int sensorValue = 0;
+const int ledPin = 2;
+
+// Variável de controle do estado do LED para o MQTT
+// bool ledState = false;
 
 void setup()
 {
   Serial.begin(115200);
 
+  // Inicialização da conexão Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("A conectar ao WiFi...");
+  }
+  
+      Serial.println("");
+      Serial.println("Ligação ao WiFi estabelecida.");
+
+
+
   pinMode(ldrPin, OUTPUT);    // Define ldrPin como saída
   Wire.begin();
   DHT.begin();    //  ESP32 default pins 21 22
+
+  // Define o pino do led como saída
+  pinMode(ledPin, OUTPUT);
 
   delay(1000);
 }
 
 void loop() {
+
+
+  // Status do led para o MQTT
+    //int ledStatus = digitalRead(ledPin);
 
   // Leitura do sensor DHT20
   if (millis() - DHT.lastRead() >= 1000)
@@ -86,11 +121,13 @@ void loop() {
   
   if (sensorValue < 2600) {
     Serial.println("Dia");    // Se o valor do LDR for menor que 2600, considera-se que está de dia
+    digitalWrite(ledPin, LOW); // Apaga o led
   } else if (sensorValue >= 2500 && sensorValue < 3000) {
     Serial.println("Nublado/Nascer ou pôr do sol");    // Se o valor do LDR estiver entre 2500 e 3000, considera-se que está nublado ou no nascer ou pôr do sol
   } else {
     Serial.println("Noite");    // Se o valor do LDR for maior ou igual a 3000, considera-se que está de noite (O sensor vai de 0 a 4095)
+    digitalWrite(ledPin, HIGH); // Acende o led
   }
   
-  delay(300);
+  delay(10000);
 }
