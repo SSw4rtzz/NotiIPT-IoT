@@ -129,3 +129,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 ProjWAPI/esp_secrets.h
+ProjWAPI/.DS_Store
