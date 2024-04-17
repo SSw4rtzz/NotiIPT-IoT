@@ -52,12 +52,12 @@
 
 .sidebar header .imagemPerfil,
 .sidebar .icon{
-  min-width: 60px;
+  min-width: 50px;
   border-radius: 6px;
 }
 
 .sidebar .icon{
-  min-width: 60px;
+  min-width: 48px;
   border-radius: 6px;
   height: 100%;
   display: flex;
@@ -116,18 +116,19 @@ header .imagem-menu .funcao{
 .sidebar header .imagemPerfil img{
   width: 40px;
   border-radius: 6px;
+  z-index: 2;
 }
 
 .sidebar header .toggle{
   position: absolute;
   top: 50%;
-  right: -25px;
-  transform: translateY(-50%) rotate(180deg);
-  height: 25px;
-  width: 25px;
-  background-color: var(--primary-color);
-  color: var(--sidebar-color);
-  border-radius: 50%;
+  right: -39px;
+  transform: translateY(-50%) rotate(135deg);
+  height: 40px;
+  width: 40px;
+  background-color: var(--sidebar-color);
+  /* color: var(--sidebar-color); */
+  border-radius: 15%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,8 +137,13 @@ header .imagem-menu .funcao{
   transition: var(--tran-05);
 }
 
+.sidebar header .togleIcon{
+  transform: rotate(40deg);
+}
+
 .sidebar.fechada .toggle{
-  transform: translateY(-50%) rotate(0deg);
+  transform: translateY(-50%) rotate(-45deg);
+  z-index: 1;
 }
 
 .sidebar .menu{
