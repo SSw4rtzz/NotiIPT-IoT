@@ -7,6 +7,8 @@ import Sidebar from './components/side-adminbar/side-adminbar.jsx';
 // Importa páginas
 import TestPage from './pages/test.jsx';
 import LoremPage from './pages/lorem.jsx';
+import GestaoSala from './pages/GestaoSala.jsx';
+
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/teste" element={<TestPage />} />
         <Route path="/lorem" element={<LoremPage />} />
+        <Route path="/gestaosala" element={<GestaoSala />} />
       </Routes>
     </div>
     );

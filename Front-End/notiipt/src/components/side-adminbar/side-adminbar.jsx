@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
 import './side-adminbar.css';
 
 import imagemPerfil from '@/assets/images/profile/perfil.jpg';
 
 // Font Awesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faHouse, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { faChevronRight, faHouse, faSliders, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 
 const Sidebar = () => {
+
+  const location = useLocation();
 
   // Esconde e mostra o menu
   useEffect(() => {
@@ -52,11 +55,11 @@ const Sidebar = () => {
         <div className="menu">
 
           <ul className="menu-links">
-            <li className="nav-link active">
-              <a href="#">
+            <li className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+              <Link to="/">
                <i className='icon'><FontAwesomeIcon icon={faHouse} /></i>
                 <span className="text nav-text">Inicio</span>
-              </a>
+              </Link>
             </li>
 
             <li className="nav-link">
@@ -83,6 +86,14 @@ const Sidebar = () => {
         </div>
 
         <div className="bottom-content">
+        <li className={`nav-link ${location.pathname === '/gestaosala' ? 'active' : ''}`}>
+            <Link to="/gestaosala">
+            <i className='icon'>
+              <FontAwesomeIcon icon={faSliders} />
+            </i>
+              <span className="text nav-text">Gestão da Sala</span>
+            </Link>
+          </li>
           <li className="">
             <a href="#">
             <i className='icon'>
@@ -94,11 +105,7 @@ const Sidebar = () => {
         </div>
       </div>
     </nav>
-    
-    <section className="home">
-        <div className="text">NotiIPT - Admin</div>
-      </section>
-      </>      
+    </>      
   );
 }
 

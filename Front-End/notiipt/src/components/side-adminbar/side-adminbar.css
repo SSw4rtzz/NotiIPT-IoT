@@ -1,5 +1,9 @@
+/* importa as cores */
+@import url('/src/styles/colors.css');
+
 /* Google Font Import - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 *{
     margin: 0;
     padding: 0;
@@ -8,14 +12,6 @@
 }
 
 :root{
-    /* ===== Cores ===== */
-    --body-color: #E4E9F7;
-    --sidebar-color: #FFF;
-    --primary-color: #fec85c;
-    --primary-color-light: #F6F5FF;
-    --toggle-color: #DDD;
-    --text-color: #707070;
-
     /* ====== Transitions ====== */
     --tran-03: all 0.2s ease;
     --tran-03: all 0.3s ease;
