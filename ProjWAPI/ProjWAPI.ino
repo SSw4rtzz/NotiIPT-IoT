@@ -11,6 +11,17 @@
 const char* ssid = SECRET_SSID;
 const char* password = SECRET_PASS;
 
+// Configuração do broker MQTT (Ngrok)
+const char* mqtt_server = "0.tcp.eu.ngrok.io"; // ATUALIZAR a cada ligação
+const int mqtt_port = 16277;                   // ATUALIZAR a cada ligação
+
+// Configuração das credenciais do MQTT
+const char* mqttuser = MQTT_USERNAME;
+const char* mqttpass = MQTT_PASSWORD;
+
+// Tópico MQTT para enviar os dados dos sensores
+const char* mqttPubDados = "dadosSensores";
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -24,6 +35,8 @@ const int ledPin = 2;  // Pino do LED
 int sensorValue = 0;   // Variável para armazenar o valor do LDR
 
 String formattedDate; // Hora formatada
+
+bool ledState = false; // Estado inicial do LED (desligado)
 
 void setup() {
   Serial.begin(115200);
@@ -41,9 +54,22 @@ void setup() {
 
   Wire.begin();   // Ativa o protocolo I2C, necessário para o sensor DHT20
   DHT.begin();    // ESP32 default pins 21 22
+
+  // Inicialização do MQTT
+  client.setServer(mqtt_server, mqtt_port);
+  client.setCallback(callback);
+  reconnect();
 }
 
 void loop() {
+  // Verifica se a conexão MQTT está ativa
+  if (!client.connected()) {
+    reconnect();
+  }
+  
+  // Gere as mensagens MQTT
+  client.loop();
+
   // Obtem a hora atual formatada
   timeClient.update();
   formattedDate = getCurrentTimeString();  
@@ -74,12 +100,27 @@ void loop() {
 
   // Verifica o valor do LDR e ajusta o LED
   if (sensorValue < 2600) {
-    Serial.println("Dia");
-    digitalWrite(ledPin, LOW); // Apaga o LED durante o dia
+    Serial.println("Boa luminusidade");
+    digitalWrite(ledPin, LOW); // Apaga o LED se a luminusidade estiver boa
+    ledState = false; // Atualiza o estado do LED para desligado
   } else {
-    Serial.println("Noite");
-    digitalWrite(ledPin, HIGH); // Acende o LED durante a noite
+    Serial.println("Escuro");
+    digitalWrite(ledPin, HIGH); // Acende o LED se estiver escuro
+    ledState = true; // Atualiza o estado do LED para ligado
   }
+
+// -- Guarda a leitura dos sensores em sensorData --
+  String sensorData = "{";
+  sensorData += "\"temperatura\": " + String(temperature, 1) + ",";
+  sensorData += "\"humidade\": " + String(humidity, 1) + ",";
+  sensorData += "\"ldr\": " + String(sensorValue) + ",";
+  sensorData += "\"led\": \"" + String(ledState ? "Ligado" : "Desligado") + "\",";
+  sensorData += "\"hora\": \"" + formattedDate + "\"";
+  sensorData += "}";
+
+  // Publica os dados dos sensores no tópico MQTT
+  client.publish(mqttPubDados, sensorData.c_str());
+  Serial.println("Dados enviados com sucesso para o servidor MQTT");
   delay(10000); // Delay entre leituras
 }
 
@@ -115,4 +156,25 @@ String getTwoDigitString(int number) {
   } else {
     return String(number);
   }
+}
+
+// Loop até que o cliente MQTT esteja reconectado
+void reconnect() {
+  while (!client.connected()) {
+    Serial.println("A tentar reconectar ao broker MQTT...");
+    String clientId = "ESP32Client-";
+    clientId += String(random(0xffff), HEX);
+    if (client.connect(clientId.c_str(), mqttuser, mqttpass)) {
+      Serial.println("Reconectado com sucesso ao broker MQTT.");
+    } else {
+      Serial.print("Falha na reconexão ao broker MQTT, estado: ");
+      Serial.print(client.state());
+      Serial.println("Voltar a tentar reconectar daqui a 15 segundos...");
+      delay(15000);
+    }
+  }
+}
+
+// Manipular mensagens recebidas
+void callback(char* topic, byte* payload, unsigned int length) {
 }

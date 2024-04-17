@@ -130,3 +130,4 @@ dist
 .pnp.*
 ProjWAPI/esp_secrets.h
 ProjWAPI/.DS_Store
+Front-End/notiipt.code-workspace
