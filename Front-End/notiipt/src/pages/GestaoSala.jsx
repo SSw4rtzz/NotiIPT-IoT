@@ -54,6 +54,7 @@ function Gestao() {
                     </div>
                     <i className='card-GS-icon'><FontAwesomeIcon icon={faLightbulb} /></i>
                 </div>
+                <span className="card-GS-btn">Acender</span>
             </div>
         </section>
         </div>

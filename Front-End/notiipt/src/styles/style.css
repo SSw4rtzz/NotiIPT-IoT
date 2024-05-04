@@ -87,3 +87,24 @@
     height: 100%;
     width: 80px;
 }
+
+.card-GS-btn{
+    background-color: #667085; /* TODO Adaptar ao darkmode */
+    color: #fff; /* TODO Adaptar ao darkmode */
+    border: none;
+    border-radius: 8px;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    user-select: none;
+}
+
+.card-GS-btn:hover {
+    background-color: #4d5b6a; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-btn:active {
+    background-color: #3a4552; /* TODO Adaptar ao darkmode */
+}
