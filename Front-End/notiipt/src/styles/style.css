@@ -48,6 +48,13 @@
     gap: 8px;
 }
 
+.card-GS-container-evolucao {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+}
+
 .card-GS-titulo{
     color: #667085; /* TODO Adaptar ao darkmode */
     font-size: 0.75em;
@@ -87,6 +94,41 @@
     height: 100%;
     width: 80px;
 }
+
+.card-GS-evolucao {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.card-GS-evolucao-text {
+    color: #667085; /* TODO Adaptar ao darkmode */
+    font-size: 0.75em;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.card-GS-evolucao.positivo {
+    color: #BACD92; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-evolucao.negativo {
+    color: #D37676; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-evolucao.tempPositivo {
+    color: #D37676; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-evolucao.tempPnegativo {
+    color: #81a1c1; /* TODO Adaptar ao darkmode */
+}
+
+
 
 .card-GS-btn{
     background-color: #667085; /* TODO Adaptar ao darkmode */
