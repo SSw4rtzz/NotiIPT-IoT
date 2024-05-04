@@ -82,9 +82,8 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    background-color: #212636;
     overflow: hidden;
-    font-size: 14px;
-    height: 56px;
-    width: 56px;
+    font-size: 4.5em;
+    height: 100%;
+    width: 80px;
 }
