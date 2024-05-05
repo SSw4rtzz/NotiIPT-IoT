@@ -78,18 +78,34 @@
     position: relative;
     overflow: hidden;
     display: block;
-    height: 4px;
+    height: 5px;
+    width: 100%;
+    margin-top: 10px;
     z-index: 0;
-    background-color:rgba(0, 0, 0, 0.5)
+    background-color:rgba(0, 0, 0, 0.2)
 }
+
+.card-GS-barra-preenchida {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Cor preenchida com opacidade mais carregada */
+  }
+
+  .card-GS-lampada {
+    position:fixed;
+    width: 10%; /* Nível de luminosidade onde a lâmpada acende (30%) */
+    color: #000;
+    font-size: 1.5em;
+    z-index: 1;
+  }
 
 .card-GS-icon {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
     font-size: 4.5em;
     height: 100%;
     width: 80px;
@@ -124,11 +140,9 @@
     color: #D37676; /* TODO Adaptar ao darkmode */
 }
 
-.card-GS-evolucao.tempPnegativo {
+.card-GS-evolucao.tempNegativo {
     color: #81a1c1; /* TODO Adaptar ao darkmode */
 }
-
-
 
 .card-GS-btn{
     background-color: #667085; /* TODO Adaptar ao darkmode */
