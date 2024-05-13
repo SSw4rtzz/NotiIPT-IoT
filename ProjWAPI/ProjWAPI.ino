@@ -12,8 +12,8 @@ const char* ssid = SECRET_SSID;
 const char* password = SECRET_PASS;
 
 // Configuração do broker MQTT (Ngrok)
-const char* mqtt_server = "0.tcp.eu.ngrok.io"; // ATUALIZAR a cada ligação
-const int mqtt_port = 16277;                   // ATUALIZAR a cada ligação
+const char* mqtt_server = "192.168.137.200"; // Ip da máquina
+const int mqtt_port = 1883;
 
 // Configuração das credenciais do MQTT
 const char* mqttuser = MQTT_USERNAME;
