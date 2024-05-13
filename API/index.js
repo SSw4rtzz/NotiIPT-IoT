@@ -2,6 +2,7 @@ const express = require('express');
 const mqtt = require('mqtt');
 const http = require('http');
 const socketIo = require('socket.io');
+const oauthServer = require('express-oauth-server');
 
 const app = express();
 const server = http.createServer(app);
@@ -42,6 +43,14 @@ app.get('/dados', (req, res) => {
     res.send(mqttData);
 });
 
+app.oauth = new oauthServer({
+    model: {}, // Especificar seu modelo de dados de autenticação OAuth 2.0 aqui
+    allowBearerTokensInQueryString: true
+});
+
+// Endpoint para autenticação de token
+app.all('/oauth/token', app.oauth.token());
+
 // Inicia o servidor HTTP
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
@@ -56,3 +65,16 @@ io.on('connection', (socket) => {
         console.log('Cliente WebSocket desconectado');
     });
 });
+
+// Middleware de autenticação para verificar o token OAuth 2.0
+function authenticateRequest(req, res, next) {
+    const token = req.headers.authorization ? req.headers.authorization.replace('Bearer ', '') : null;
+    // Validar o token usando o seu modelo de dados de autenticação OAuth 2.0
+    // Se o token for válido, chame next()
+    // Senão, retorne um erro de autenticação
+    if (token) {
+        next();
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+}
