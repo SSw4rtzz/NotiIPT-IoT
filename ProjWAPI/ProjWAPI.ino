@@ -32,7 +32,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+NTPClient timeClient(ntpUDP,"europe.pool.ntp.org", 3600);
 
 DHT20 DHT;
 
