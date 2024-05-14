@@ -10,3 +10,157 @@
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
+
+.grid-GS {
+    flex-flow: wrap;
+    min-width: 0px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+.card-GS {
+    background-color: #fff; /* TODO Adaptar ao darkmode */
+    margin: 2% 1%;
+    width: 20%;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.04) 0px 5px 22px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    padding: 32px 24px;
+    /*box-shadow: 0 1 2px rgba(0, 0, 0, 0.08);*/
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-GS-container {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5em;
+}
+
+.card-GS-container-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-GS-container-evolucao {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+}
+
+.card-GS-titulo{
+    color: #667085; /* TODO Adaptar ao darkmode */
+    font-size: 0.75em;
+    margin: opx 0px 0.35em;
+    font-weight: 500;
+    line-height: 2.5;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.card-GS-dados {
+    color: #212636; /* TODO Adaptar ao darkmode */
+    font-size: 2em;
+    font-weight: 500;
+    margin: 0px;
+    text-align: left;
+}
+
+.card-GS-barra {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    height: 5px;
+    width: 100%;
+    margin-top: 10px;
+    z-index: 0;
+    background-color:rgba(0, 0, 0, 0.2)
+}
+
+.card-GS-barra-preenchida {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Cor preenchida com opacidade mais carregada */
+  }
+
+  .card-GS-lampada {
+    position:fixed;
+    width: 10%; /* Nível de luminosidade onde a lâmpada acende (30%) */
+    color: #000;
+    font-size: 1.5em;
+    z-index: 1;
+  }
+
+.card-GS-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.5em;
+    height: 100%;
+    width: 80px;
+}
+
+.card-GS-evolucao {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.card-GS-evolucao-text {
+    color: #667085; /* TODO Adaptar ao darkmode */
+    font-size: 0.75em;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.card-GS-evolucao.positivo {
+    color: #BACD92; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-evolucao.negativo {
+    color: #D37676; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-evolucao.tempPositivo {
+    color: #D37676; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-evolucao.tempNegativo {
+    color: #81a1c1; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-btn{
+    background-color: #667085; /* TODO Adaptar ao darkmode */
+    color: #fff; /* TODO Adaptar ao darkmode */
+    border: none;
+    border-radius: 8px;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    user-select: none;
+}
+
+.card-GS-btn:hover {
+    background-color: #4d5b6a; /* TODO Adaptar ao darkmode */
+}
+
+.card-GS-btn:active {
+    background-color: #3a4552; /* TODO Adaptar ao darkmode */
+}
