@@ -22,8 +22,8 @@ const char* mqttpass = MQTT_PASSWORD;
 const char* topico = "sala0/";
 
 // Sub-tópicos MQTT para enviar os dados dos sensores
-String mqttPubHumidade = String(topico) + "humidade";
 String mqttPubTemperatura = String(topico) + "temperatura";
+String mqttPubHumidade = String(topico) + "humidade";
 String mqttPubLdr = String(topico) + "ldr";
 String mqttPubLed = String(topico) + "led";
 String mqttPubHora = String(topico) + "hora";
@@ -116,8 +116,8 @@ void loop() {
   }
 
   // Publica os dados dos sensores nos tópicos MQTT
+  client.publish(mqttPubTemperatura.c_str(), String(temperature, 1).c_str());
   client.publish(mqttPubHumidade.c_str(), String(humidity, 1).c_str());
-  client.publish(mqttPubHumidade.c_str(), String(temperature, 1).c_str());
   client.publish(mqttPubLdr.c_str(), String(sensorValue).c_str());
   client.publish(mqttPubLed.c_str(), ledState ? "Ligado" : "Desligado");
   client.publish(mqttPubHora.c_str(), formattedDate.c_str());

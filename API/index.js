@@ -7,10 +7,16 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-let mqttData = '';
+let sensorData = {
+    temperatura: null,
+    humidade: null,
+    ldr: null,
+    led: null,
+    hora: null
+};
 
-// Configuração do  broker MQTT
-const mqttBrokerUrl = 'mqtt://127.0.0.1:1883'; // Localhost;
+// Configuração do broker MQTT
+const mqttBrokerUrl = 'mqtt://127.0.0.1:1883'; // Localhost
 const mqttOptions = {
     clientId: "Teste",
     username: 'user1',
@@ -18,19 +24,23 @@ const mqttOptions = {
 };
 const mqttClient = mqtt.connect(mqttBrokerUrl, mqttOptions);
 
-// Subscreve o tópico 'dadosSensores' ao conectar ao broker MQTT
+// Subscreve o tópico 'sala0/#' ao conectar ao broker MQTT
 mqttClient.on('connect', () => {
     console.log('Conectado ao broker MQTT');
-    mqttClient.subscribe('dadosSensores'); 
+    mqttClient.subscribe('sala0/#');
 });
 
-// Guarda e envia a mensagem ao cliente via WebSocket quando uma mensagem é recebida do broker MQTT
+// Atualiza o objeto sensorData e envia a mensagem ao cliente via WebSocket quando uma mensagem é recebida do broker MQTT
 mqttClient.on('message', (topic, message) => {
-    console.log('Nova mensagem recebida do broker MQTT:', message.toString());
-    mqttData = message.toString();
-    io.emit('dadosSensores', message.toString()); // Envia a mensagem para o cliente via WebSocket
-});
+    console.log(`Nova mensagem recebida do tópico ${topic}: ${message.toString()}`);
+    
+    if (topic.startsWith('sala0/')) {
+        const subtopic = topic.split('/')[1];
+        sensorData[subtopic] = message.toString();
+    }
 
+    io.emit('dadosSensores', JSON.stringify(sensorData)); // Envia os dados agregados para o cliente via WebSocket
+});
 
 // Rota de teste
 app.get('/', (req, res) => {
@@ -39,7 +49,7 @@ app.get('/', (req, res) => {
 
 // Rota que retorna os dados do MQTT
 app.get('/dados', (req, res) => {
-    res.send(mqttData);
+    res.json(sensorData);
 });
 
 // Inicia o servidor HTTP
