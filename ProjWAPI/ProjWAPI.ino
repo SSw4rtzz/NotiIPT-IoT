@@ -19,8 +19,14 @@ const int mqtt_port = 1883;
 const char* mqttuser = MQTT_USERNAME;
 const char* mqttpass = MQTT_PASSWORD;
 
-// Tópico MQTT para enviar os dados dos sensores
-const char* mqttPubDados = "dadosSensores";
+const char* topico = "sala0/";
+
+// Sub-tópicos MQTT para enviar os dados dos sensores
+String mqttPubHumidade = String(topico) + "humidade";
+String mqttPubTemperatura = String(topico) + "temperatura";
+String mqttPubLdr = String(topico) + "ldr";
+String mqttPubLed = String(topico) + "led";
+String mqttPubHora = String(topico) + "hora";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -93,7 +99,7 @@ void loop() {
   Serial.print(temperature, 1);
   Serial.println("°C\n");
   
-// Leitura do sensor LDR
+  // Leitura do sensor LDR
   sensorValue = analogRead(ldrPin);
   Serial.print("Valor lido pelo LDR: ");
   Serial.println(sensorValue);
@@ -109,17 +115,13 @@ void loop() {
     ledState = true; // Atualiza o estado do LED para ligado
   }
 
-// -- Guarda a leitura dos sensores em sensorData --
-  String sensorData = "{";
-  sensorData += "\"temperatura\": " + String(temperature, 1) + ",";
-  sensorData += "\"humidade\": " + String(humidity, 1) + ",";
-  sensorData += "\"ldr\": " + String(sensorValue) + ",";
-  sensorData += "\"led\": \"" + String(ledState ? "Ligado" : "Desligado") + "\",";
-  sensorData += "\"hora\": \"" + formattedDate + "\"";
-  sensorData += "}";
-
-  // Publica os dados dos sensores no tópico MQTT
-  client.publish(mqttPubDados, sensorData.c_str());
+  // Publica os dados dos sensores nos tópicos MQTT
+  client.publish(mqttPubHumidade.c_str(), String(humidity, 1).c_str());
+  client.publish(mqttPubHumidade.c_str(), String(temperature, 1).c_str());
+  client.publish(mqttPubLdr.c_str(), String(sensorValue).c_str());
+  client.publish(mqttPubLed.c_str(), ledState ? "Ligado" : "Desligado");
+  client.publish(mqttPubHora.c_str(), formattedDate.c_str());
+  
   Serial.println("Dados enviados com sucesso para o servidor MQTT");
   delay(10000); // Delay entre leituras
 }
