@@ -10,6 +10,7 @@ import { faDroplet,
     faGripLinesVertical
 } from '@fortawesome/free-solid-svg-icons'; // Solid
 import {faSun} from '@fortawesome/free-regular-svg-icons'; // Regular
+import Ipma from '../components/ipma/ipma';
 
 function Gestao() {
     const [temperatura, setTemperatura] = useState(''); // Temperatura da sala
@@ -153,6 +154,9 @@ function Gestao() {
                     <span className="card-GS-btn">Acender</span>
                 </div>
             )}
+        </section>
+        <section className="grid-GS">
+            <Ipma />
         </section>
         </div>
     );

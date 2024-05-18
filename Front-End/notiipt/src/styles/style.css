@@ -4,6 +4,8 @@
 /* Google Font Import - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
 *{
     margin: 0;
     padding: 0;
@@ -55,7 +57,7 @@
     align-items: center;
 }
 
-.card-GS-titulo{
+.card-GS-titulo {
     color: #667085; /* TODO Adaptar ao darkmode */
     font-size: 0.75em;
     margin: opx 0px 0.35em;
@@ -163,4 +165,82 @@
 
 .card-GS-btn:active {
     background-color: #3a4552; /* TODO Adaptar ao darkmode */
+}
+
+/* EXTERIOR */
+.exterior {
+    display: flex;
+    flex-direction: column;
+    height: 30vh;
+    width: 30%;
+}
+
+.exterior.card-GS.noite {
+    background: linear-gradient(120deg, #aeaeae -10%, #525253 20%, #323233 100%);
+}
+
+.exterior.card-GS.dia {
+    background: linear-gradient(120deg, #1c3281 -10%, #4265e4 20%, #2c92e0 100%);
+}
+
+.dia{
+    color: #ffffff;
+}
+
+.exterior .card-GS-titulo {
+    color: #ffffff;
+}
+
+.card-GS-temp {
+    font-family: 'Raleway', sans-serif;
+    font-size: 60px;
+    font-weight: 200;
+}
+
+.card-GS-estado-tempo {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 100;
+}
+
+.card-GS-info {
+    font-family: 'Raleway', sans-serif;
+    font-size: 25px;
+    font-weight: 400;
+}
+
+.card-GS-info-titulo {
+    font-family: 'Raleway', sans-serif;
+    font-size: 15px;
+    font-weight: 100;
+    margin-top: -5px;
+}
+
+.card-GS-info {
+    display: flex;
+    margin-top: 40px;
+}
+
+.card-GS-icon-info {
+    font-size: 1.7em;
+    margin-right: 0.3em;
+}
+
+.card-GS-icon-info-container {
+    margin-left: 30px;
+}
+
+.card-GS-icon.dia {
+    animation: rodar 20s ease-in-out infinite;
+}
+
+@keyframes rodar {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
 }
