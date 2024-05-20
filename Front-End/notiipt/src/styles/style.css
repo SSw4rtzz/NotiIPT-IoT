@@ -41,7 +41,7 @@
     align-items: flex-start;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5em;
+    margin-bottom: 1em;
 }
 
 .card-GS-container-text {
@@ -171,7 +171,7 @@
 .exterior {
     display: flex;
     flex-direction: column;
-    min-height: 30vh;
+    min-height: 26vh;
     min-width: 42%;
 }
 
@@ -210,13 +210,18 @@
     font-weight: 300;
 }
 
-.card-GS-info {
+.card-GS-info-container {
     display: flex;
     font-family: 'Raleway', sans-serif;
     font-size: 25px;
     font-weight: 400;
     margin-top: 1em;
 }
+
+.card-GS-info {
+    margin-left: 10px;
+}
+
 
 .card-GS-info-titulo {
     font-family: 'Raleway', sans-serif;
@@ -227,14 +232,21 @@
 
 .card-GS-icon-info {
     font-size: 1.7em;
-    margin-right: 0.3em;
 }
 
 .card-GS-icon-info-container {
     margin-left: 30px;
 }
 
-.card-GS-icon.dia {
+.card-GS-img-container {
+    margin-left: 1em;
+}
+.card-GS-img {  
+    width: 250px;
+    margin-top: -6em;
+}
+
+.card-GS-img.dia {
     animation: rodar 20s ease-in-out infinite;
 }
 
