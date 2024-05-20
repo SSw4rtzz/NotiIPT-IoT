@@ -171,8 +171,8 @@
 .exterior {
     display: flex;
     flex-direction: column;
-    height: 30vh;
-    width: 30%;
+    min-height: 30vh;
+    min-width: 42%;
 }
 
 .exterior.card-GS.noite {
@@ -197,27 +197,32 @@
     font-weight: 200;
 }
 
+.card-GS-temp-min{
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 30px;
+    opacity: 0.5;
+    margin-top: -15px;
+}
+
 .card-GS-estado-tempo {
     font-family: 'Raleway', sans-serif;
-    font-weight: 100;
+    font-weight: 300;
 }
 
 .card-GS-info {
+    display: flex;
     font-family: 'Raleway', sans-serif;
     font-size: 25px;
     font-weight: 400;
+    margin-top: 1em;
 }
 
 .card-GS-info-titulo {
     font-family: 'Raleway', sans-serif;
     font-size: 15px;
-    font-weight: 100;
+    font-weight: 300;
     margin-top: -5px;
-}
-
-.card-GS-info {
-    display: flex;
-    margin-top: 40px;
 }
 
 .card-GS-icon-info {
