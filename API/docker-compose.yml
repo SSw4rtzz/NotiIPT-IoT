@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   mqtt:
     image: eclipse-mosquitto
@@ -7,11 +7,6 @@ services:
       - "9001:9001"
 
   api:
-    build: ./api
+    build: .
     ports:
       - "3000:3000"
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3001:3000"

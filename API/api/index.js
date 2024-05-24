@@ -1,7 +1,11 @@
+require('dotenv').config({path:'secrets.env'});
+
 const express = require('express');
 const mqtt = require('mqtt');
 const http = require('http');
 const socketIo = require('socket.io');
+const basicAuth = require('basic-auth');
+const path = require('path'); // Adicionado para servir arquivos estáticos
 
 const app = express();
 const server = http.createServer(app);
@@ -15,12 +19,31 @@ let sensorData = {
     hora: null
 };
 
+// Função de verificação das credenciais
+function checkAuth(req, res, next) {
+    const user = basicAuth(req);
+    const validUsername = process.env.BASIC_AUTH_USERNAME;
+    const validPassword = process.env.BASIC_AUTH_PASSWORD;
+
+    console.log('Autenticando usuário:', user); // Debugging
+    console.log('Esperado:', validUsername, validPassword); // Debugging
+
+    if (!user || user.name !== validUsername || user.pass !== validPassword) {
+        res.set('WWW-Authenticate', 'Basic realm="example"');
+        return res.status(401).send('Autenticação necessária.');
+    }
+    next();
+}
+
+// Middleware de autenticação para todas as rotas
+app.use(checkAuth);
+
 // Configuração do broker MQTT
 const mqttBrokerUrl = 'mqtt://127.0.0.1:1883'; // Localhost
 const mqttOptions = {
     clientId: "Teste",
-    username: 'user1',
-    password: 'user1'
+    username: process.env.MQTT_USERNAME,
+    password: process.env.MQTT_PASSWORD,
 };
 const mqttClient = mqtt.connect(mqttBrokerUrl, mqttOptions);
 
@@ -40,6 +63,13 @@ mqttClient.on('message', (topic, message) => {
     }
 
     io.emit('dadosSensores', JSON.stringify(sensorData)); // Envia os dados agregados para o cliente via WebSocket
+});
+
+// Servir os arquivos estáticos do frontend React
+app.use(express.static(path.join(__dirname, 'notiipt')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'notiipt', 'index.html'));
 });
 
 // Rota de teste
