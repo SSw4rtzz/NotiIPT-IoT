@@ -66,20 +66,20 @@ mqttClient.on('message', (topic, message) => {
 });
 
 // Servir os arquivos estáticos do frontend React
-app.use(express.static(path.join(__dirname, 'notiipt')));
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'notiipt', 'index.html'));
-});
+app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
 
 // Rota de teste
-app.get('/', (req, res) => {
+app.get('/test', (req, res) => {
     res.send('API a funcionar..');
 });
 
 // Rota que retorna os dados do MQTT
-app.get('/dados', (req, res) => {
+app.get('/api/dados', (req, res) => {
     res.json(sensorData);
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'notiipt', 'dist', 'index.html'));
 });
 
 // Inicia o servidor HTTP

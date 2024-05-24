@@ -1,7 +1,7 @@
 # Imagem base para Node.js
 FROM node:14
 
-# Diretório de trabalho para a API
+# Diretório de trabalho para a aplicação
 WORKDIR /usr/src/app
 
 # Copiar arquivos da API
@@ -9,18 +9,19 @@ COPY ./api/package*.json ./
 RUN npm install
 COPY ./api .
 
-# Build do front-end
+# Copiar arquivos do front-end React
+COPY ./notiipt ./notiipt
+
+# Instalar dependências e construir o front-end React
 WORKDIR /usr/src/app/notiipt
-COPY ./notiipt/package*.json ./
 RUN npm install
-COPY ./notiipt .
 RUN npm run build
 
-# Voltar para o diretório da API
+# Voltar para o diretório raiz
 WORKDIR /usr/src/app
 
-# Servir o front-end e iniciar a API
-CMD ["sh", "-c", "npx serve -s notiipt/build & node index.js"]
-
-# Expor a porta da API
+# Expor a porta da aplicação
 EXPOSE 3000
+
+# Iniciar o servidor Express para servir o front-end e a API
+CMD ["node", "index.js"]
