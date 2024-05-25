@@ -11,6 +11,10 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const cors = require('cors');
+app.use(cors());
+
+
 let sensorData = {
     temperatura: null,
     humidade: null,
