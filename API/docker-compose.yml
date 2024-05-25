@@ -4,6 +4,11 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/config/passwd:/mosquitto/config/passwd
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
 
   api:
     build: .
