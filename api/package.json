@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "API do projeto de IoT NotiIPT",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "test"
+  },
+  "author": "Ruben & Tiago",
+  "license": "ISC",
+  "dependencies": {
+    "basic-auth": "^2.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-oauth-server": "^2.0.0",
+    "mqtt": "^5.5.5",
+    "socket.io": "^4.7.5"
+  }
+}

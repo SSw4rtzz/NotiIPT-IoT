@@ -114,18 +114,18 @@ const Ipma = () => {
           </div>
           {tempo === 4 || tempo === 5 || tempo === 16 || tempo === 17 ? (
             <div className='card-GS-img-container'>
-              <img className='card-GS-img' src='/src/assets/images/ipma/nuvens.png'/>
+              <img className='card-GS-img' src='./assets/images/ipma/nuvens.png'/>
             </div>
           ) : tempoClasse.includes("chuva") || tempoClasse.includes("rain") || tempoClasse.includes("Chuvisco") ? (
             <div className='card-GS-img-container'>
-              <img className='card-GS-img' src='/src/assets/images/ipma/chuva.png'/>
+              <img className='card-GS-img' src='./assets/images/ipma/chuva.png'/>
             </div>
           ) : (
             <div className='card-GS-img-container'>
               {classeExterior === 'exterior card-GS noite' ? (
-                <img className='card-GS-img dia' src='/src/assets/images/ipma/lua.png'/>
+                <img className='card-GS-img dia' src='./assets/images/ipma/lua.png'/>
               ) : (
-                <img className='card-GS-img dia' src='/src/assets/images/ipma/sol.png'/>
+                <img className='card-GS-img dia' src='./assets/images/ipma/sol.png'/>
               )}
             </div>
           )}
