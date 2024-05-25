@@ -25,9 +25,6 @@ function checkAuth(req, res, next) {
     const validUsername = process.env.BASIC_AUTH_USERNAME;
     const validPassword = process.env.BASIC_AUTH_PASSWORD;
 
-    console.log('Autenticando usuário:', user); // Debugging
-    console.log('Esperado:', validUsername, validPassword); // Debugging
-
     if (!user || user.name !== validUsername || user.pass !== validPassword) {
         res.set('WWW-Authenticate', 'Basic realm="example"');
         return res.status(401).send('Autenticação necessária.');
@@ -39,7 +36,7 @@ function checkAuth(req, res, next) {
 app.use(checkAuth);
 
 // Configuração do broker MQTT
-const mqttBrokerUrl = 'mqtt://127.0.0.1:1883'; // Localhost
+const mqttBrokerUrl = 'mqtt://mqtt:1883'; // Localhost
 const mqttOptions = {
     clientId: "Teste",
     username: process.env.MQTT_USERNAME,
