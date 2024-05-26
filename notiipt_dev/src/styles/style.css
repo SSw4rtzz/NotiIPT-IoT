@@ -167,6 +167,11 @@
     background-color: #3a4552; /* TODO Adaptar ao darkmode */
 }
 
+/* CHARTS */
+.chart.card-GS {
+    width: 42%;
+}
+
 /* EXTERIOR */
 .exterior {
     display: flex;
