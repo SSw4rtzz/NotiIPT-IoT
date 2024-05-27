@@ -22,9 +22,48 @@ function Gestao() {
     const [luz, setLuz] = useState(''); // Estado da luz da sala
 
 
+// ! Teste
+
+    const [luzState, setLuzState] = useState('');
+    const [autoMode, setAutoMode] = useState(true); // Modo automático inicialmente ativado
+
+    const handleControl = async (state, autoMode) => {
+        const username = 'user1';
+        const password = 'user1';
+        const headers = new Headers();
+        headers.set('Authorization', 'Basic ' + btoa(`${username}:${password}`));
+        headers.set('Content-Type', 'application/json');
+        try {
+            const response = await fetch(`http://localhost:3000/api/control`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ luzState: state, autoMode: autoMode })
+            });
+            const result = await response.text();
+            console.log(result);
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    };
+
+    const handleLuzControl = (state) => {
+        if (!autoMode) {
+            setLuzState(state);
+            handleControl(state, autoMode);
+        }
+    };
+
+    const handleAutoModeToggle = () => {
+        const newAutoMode = !autoMode;
+        setAutoMode(newAutoMode);
+        handleControl(luzState, newAutoMode);
+    };
+
+
+
     const fetchValues = async () => {
-        const username = 'user1';  // Substitua pelo seu nome de usuário
-        const password = 'user1';  // Substitua pela sua senha
+        const username = 'user1';  // !!!!!!!!!
+        const password = 'user1'; 
         const headers = new Headers();
         headers.set('Authorization', 'Basic ' + btoa(`${username}:${password}`));
         try {
@@ -42,7 +81,7 @@ function Gestao() {
 
             setLuminosidade(data.ldr);
 
-            setLuz(data.led);
+            setLuz(data.luz);
         } catch (error) {
             console.error('Erro:', error);
         }
@@ -61,7 +100,7 @@ function Gestao() {
     useEffect(() => {
         const interval = setInterval(() => {
             fetchValues();
-        }, 1000); // 1 Segundos
+        }, 10000); // 10 Segundos
         return () => clearInterval(interval);
     }, []);
 
@@ -161,6 +200,28 @@ function Gestao() {
                     <span className="card-GS-btn">Acender</span>
                 </div>
             )}
+
+            <div>
+            <div>
+                <label>
+                    Modo Automático: {luzState}
+                    <input type="checkbox" checked={autoMode} onChange={handleAutoModeToggle} />
+                </label>
+            </div>
+            {luz === 'Ligada' ? (
+                <div>
+                    <h4>Luz: Acesa</h4>
+                    <FontAwesomeIcon icon={faLightbulb} style={{ color: "#ffd42b" }} />
+                    <button onClick={() => handleLuzControl('desligar')} disabled={autoMode}>Desligar</button>
+                </div>
+            ) : (
+                <div>
+                    <h4>Luz: Apagada</h4>
+                    <FontAwesomeIcon icon={faLightbulb} />
+                    <button onClick={() => handleLuzControl('ligar')} disabled={autoMode}>Acender</button>
+                </div>
+            )}
+        </div>
         </section>
         <section className="grid-GS">
             <Charts />

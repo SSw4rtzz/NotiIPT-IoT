@@ -21,12 +21,21 @@ const char* mqttpass = MQTT_PASSWORD;
 
 const char* topico = "sala0/";
 
-// Sub-tópicos MQTT para enviar os dados dos sensores
+// Sub-tópicos MQTT para enviar os dados dos sensores (PUBLISHERS)
 String mqttPubTemperatura = String(topico) + "temperatura";
 String mqttPubHumidade = String(topico) + "humidade";
 String mqttPubLdr = String(topico) + "ldr";
-String mqttPubLed = String(topico) + "led";
+String mqttPubLuz = String(topico) + "luz/estado";
 String mqttPubHora = String(topico) + "hora";
+
+// Sub-tópicos MQTT para receber os dados do Front-End (SUBSCRIBERS)
+String mqttSubAutoControl = String(topico) + "auto"; // Tópico de automatização (Ativado ou Desligado)
+String mqttSubLuzControl = String(topico) + "luz/controloManual"; // Tópico de Ligar ou Apagar luz manualmente (Ligada ou Apagada)
+
+const char* mqttAutoModeTopic = "sala0/luz/auto-mode"; //********
+const char* mqttLuzTopic = "sala0/luz/controlo";                 //********
+bool autoMode = true;
+
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -42,7 +51,7 @@ int ldrValue = 0;   // Variável para armazenar o valor do LDR
 
 String formattedDate; // Hora formatada
 
-bool ledState = false; // Estado inicial do LED (desligado)
+bool luzState = false; // Estado inicial do LED (desligado)
 
 void setup() {
   Serial.begin(115200);
@@ -65,6 +74,10 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
   reconnect();
+
+  // Subscreve aos tópicos MQTT relevantes
+  client.subscribe(mqttAutoModeTopic);
+  client.subscribe(mqttLuzTopic);
 }
 
 void loop() {
@@ -101,29 +114,32 @@ void loop() {
   
   // Leitura do sensor LDR
   ldrValue = analogRead(ldrPin);
-  Serial.print("Valor lido pelo LDR: ");
-  Serial.println(ldrValue);
-
+  // Converte valor lido pelo LDR em percentagem em que 0% é escuro e 100% é claridade
   int ldrPercentagem = map(ldrValue, 0, 4095, 100, 0);
+  Serial.print("Valor lido pelo LDR: ");
+  Serial.println(ldrPercentagem);
 
-  // Verifica o valor do LDR e ajusta o LED
-  if (ldrPercentagem > 40) {
-    Serial.println("Boa luminusidade");
-    digitalWrite(ledPin, LOW); // Apaga o LED se a luminusidade estiver boa
-    ledState = false; // Atualiza o estado do LED para desligado
-  } else if(ldrPercentagem < 35) {
-    Serial.println("Escuro");
-    digitalWrite(ledPin, HIGH); // Acende o LED se estiver escuro
-    ledState = true; // Atualiza o estado do LED para ligado
+  Serial.print("DEBUG: ");
+  Serial.println(autoMode);
+  
+// Verifica o estado do modo automático antes de ajustar o LED
+  if (autoMode) {
+    if (ldrPercentagem > 40) {
+      digitalWrite(ledPin, LOW); // Apaga o LED
+      luzState = false;
+    } else if (ldrPercentagem < 35) {
+      digitalWrite(ledPin, HIGH); // Acende o LED
+      luzState = true;
+    }
+  // Publica os dados do sensor ldr nos tópicos MQTT
   }
 
   // Publica os dados dos sensores nos tópicos MQTT
   client.publish(mqttPubTemperatura.c_str(), String(temperature, 1).c_str());
   client.publish(mqttPubHumidade.c_str(), String(humidity, 1).c_str());
   client.publish(mqttPubLdr.c_str(), String(ldrPercentagem).c_str());
-  client.publish(mqttPubLed.c_str(), ledState ? "Ligada" : "Desligada");
+  client.publish(mqttPubLuz.c_str(), luzState ? "Ligada" : "Desligada");
   client.publish(mqttPubHora.c_str(), formattedDate.c_str());
-  
   Serial.println("Dados enviados com sucesso para o servidor MQTT");
   delay(10000); // Delay entre leituras
 }
@@ -179,6 +195,34 @@ void reconnect() {
   }
 }
 
-// Manipular mensagens recebidas
 void callback(char* topic, byte* payload, unsigned int length) {
+  String message;
+  for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+
+      if (String(topic) == "sala0/luz/auto-mode") {
+        Serial.print("Modo automático: ");
+        if(message == "true"){
+            Serial.println("ativado");
+            autoMode = true;
+        } else {
+            Serial.println("desativado");
+            autoMode = false;
+        }
+      }
+
+    if (String(topic) == "sala0/luz/controlo" && !autoMode) {
+        Serial.print("Luz: ");
+        if(message == "ligar"){
+            Serial.println("Acesa"); //DEBUG
+            digitalWrite(ledPin, HIGH);
+            luzState = true;
+        } else if(message == "desligar"){
+            Serial.println("Apagada"); //DEBUG
+            digitalWrite(ledPin, LOW);
+            luzState = false;
+        }
+    }
 }
+

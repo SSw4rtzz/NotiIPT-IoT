@@ -1,4 +1,4 @@
-require('dotenv').config({path:'secrets.env'});
+require('dotenv').config({ path: 'secrets.env' });
 
 const express = require('express');
 const mqtt = require('mqtt');
@@ -14,12 +14,14 @@ const io = socketIo(server);
 const cors = require('cors');
 app.use(cors());
 
+// Middleware para parsing de JSON
+app.use(express.json());
 
 let sensorData = {
     temperatura: null,
     humidade: null,
     ldr: null,
-    led: null,
+    luz: null,
     hora: null
 };
 
@@ -81,6 +83,18 @@ app.get('/api/dados', (req, res) => {
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'notiipt', 'dist', 'index.html'));
+});
+
+// Endpoint para publicar o estado do LED
+app.post('/api/control', (req, res) => {
+    const { luzState, autoMode } = req.body;
+    if (autoMode !== undefined) {
+        mqttClient.publish('sala0/luz/auto-mode', autoMode.toString());
+    }
+    if (!autoMode && luzState) {
+        mqttClient.publish('sala0/luz/controlo', luzState);
+    }
+    res.send(`Modo automático ${autoMode ? 'ativado' : 'desativado'}, LUZ ${luzState}`);
 });
 
 // Inicia o servidor HTTP
