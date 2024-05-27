@@ -11,8 +11,8 @@
 const char* ssid = SECRET_SSID;
 const char* password = SECRET_PASS;
 
-// Configuração do broker MQTT (Ngrok)
-const char* mqtt_server = "192.168.137.200"; // Ip da máquina
+// Configuração do broker MQTT
+const char* mqtt_server = "192.168.137.247"; // Ip da máquina
 const int mqtt_port = 1883;
 
 // Configuração das credenciais do MQTT
@@ -38,7 +38,7 @@ DHT20 DHT;
 
 const int ldrPin = 34; // Pino do LDR
 const int ledPin = 2;  // Pino do LED
-int sensorValue = 0;   // Variável para armazenar o valor do LDR
+int ldrValue = 0;   // Variável para armazenar o valor do LDR
 
 String formattedDate; // Hora formatada
 
@@ -100,16 +100,18 @@ void loop() {
   Serial.println("°C\n");
   
   // Leitura do sensor LDR
-  sensorValue = analogRead(ldrPin);
+  ldrValue = analogRead(ldrPin);
   Serial.print("Valor lido pelo LDR: ");
-  Serial.println(sensorValue);
+  Serial.println(ldrValue);
+
+  int ldrPercentagem = map(ldrValue, 0, 4095, 100, 0);
 
   // Verifica o valor do LDR e ajusta o LED
-  if (sensorValue < 2600) {
+  if (ldrPercentagem > 40) {
     Serial.println("Boa luminusidade");
     digitalWrite(ledPin, LOW); // Apaga o LED se a luminusidade estiver boa
     ledState = false; // Atualiza o estado do LED para desligado
-  } else {
+  } else if(ldrPercentagem < 35) {
     Serial.println("Escuro");
     digitalWrite(ledPin, HIGH); // Acende o LED se estiver escuro
     ledState = true; // Atualiza o estado do LED para ligado
@@ -118,8 +120,8 @@ void loop() {
   // Publica os dados dos sensores nos tópicos MQTT
   client.publish(mqttPubTemperatura.c_str(), String(temperature, 1).c_str());
   client.publish(mqttPubHumidade.c_str(), String(humidity, 1).c_str());
-  client.publish(mqttPubLdr.c_str(), String(sensorValue).c_str());
-  client.publish(mqttPubLed.c_str(), ledState ? "Ligado" : "Desligado");
+  client.publish(mqttPubLdr.c_str(), String(ldrPercentagem).c_str());
+  client.publish(mqttPubLed.c_str(), ledState ? "Ligada" : "Desligada");
   client.publish(mqttPubHora.c_str(), formattedDate.c_str());
   
   Serial.println("Dados enviados com sucesso para o servidor MQTT");
