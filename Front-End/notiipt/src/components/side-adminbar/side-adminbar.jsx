@@ -41,11 +41,11 @@ const Sidebar = () => {
           </div>
         </div>
   
-        <i className='toggle'>
+        <div className='toggle'>
           <span className='togleIcon'>
           <FontAwesomeIcon icon={faChevronRight} />
           </span>
-        </i>
+        </div>
       </header>
 
       <div className="menu-bar">

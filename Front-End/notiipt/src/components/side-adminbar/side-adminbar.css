@@ -120,10 +120,11 @@ header .imagem-menu .funcao{
 }
 
 .sidebar header .toggle{
+  box-shadow: rgba(0, 0, 0, 0.04) 5px 5px 5px -2px, rgba(0, 0, 0, 0.06) 1px 1px 0px 0px;
   position: absolute;
   top: 50%;
   right: -39px;
-  transform: translateY(-50%) rotate(135deg);
+  transform: translateY(-50%) rotate(-45deg);
   height: 40px;
   width: 40px;
   background-color: var(--sidebar-color);
@@ -138,8 +139,15 @@ header .imagem-menu .funcao{
 }
 
 .sidebar header .togleIcon{
-  transform: rotate(40deg);
+  transform: rotate(45deg);
+  transition: var(--tran-05);
+  color: black;
 }
+
+.sidebar.fechada .toggleIcon{
+  transform: rotate(135deg);
+}
+
 
 .sidebar.fechada .toggle{
   transform: translateY(-50%) rotate(-45deg);
