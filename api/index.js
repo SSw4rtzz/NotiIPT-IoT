@@ -3,20 +3,22 @@ require('dotenv').config({ path: 'secrets.env' });
 const express = require('express');
 const mqtt = require('mqtt');
 const http = require('http');
-const socketIo = require('socket.io');
+const WebSocket = require('ws');
 const basicAuth = require('basic-auth');
-const path = require('path'); // Adicionado para servir arquivos estáticos
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
 
+ // Cria um servidor WebSocket
+const wss = new WebSocket.Server({ server });
+
+// Middleware para permitir CORS
 const cors = require('cors');
 app.use(cors());
-
-// Middleware para parsing de JSON
 app.use(express.json());
 
+// Dados dos sensores
 let sensorData = {
     temperatura: null,
     humidade: null,
@@ -25,7 +27,7 @@ let sensorData = {
     hora: null
 };
 
-// Função de verificação das credenciais
+// Middleware para autenticação básica
 function checkAuth(req, res, next) {
     const user = basicAuth(req);
     const validUsername = process.env.BASIC_AUTH_USERNAME;
@@ -37,12 +39,10 @@ function checkAuth(req, res, next) {
     }
     next();
 }
-
-// Middleware de autenticação para todas as rotas
 app.use(checkAuth);
 
-// Configuração do broker MQTT
-const mqttBrokerUrl = 'mqtt://mqtt:1883'; // Localhost
+// Configuração do cliente MQTT
+const mqttBrokerUrl = 'mqtt://mqtt:1883';
 const mqttOptions = {
     clientId: "Teste",
     username: process.env.MQTT_USERNAME,
@@ -50,7 +50,7 @@ const mqttOptions = {
 };
 const mqttClient = mqtt.connect(mqttBrokerUrl, mqttOptions);
 
-// Subscreve o tópico 'sala0/#' ao conectar ao broker MQTT
+// Subscreve o tópico sala0/# para receber dados dos sensores
 mqttClient.on('connect', () => {
     console.log('Conectado ao broker MQTT');
     mqttClient.subscribe('sala0/#');
@@ -65,27 +65,33 @@ mqttClient.on('message', (topic, message) => {
         sensorData[subtopic] = message.toString();
     }
 
-    io.emit('dadosSensores', JSON.stringify(sensorData)); // Envia os dados agregados para o cliente via WebSocket
+    // Envia os dados agregados para todos os clientes WebSocket
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(sensorData));
+        }
+    });
 });
 
-// Servir os arquivos estáticos do frontend React
+// Middleware para servir a aplicação React
 app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
 
-// Rota de teste
+// Rota para testar o servidor
 app.get('/test', (req, res) => {
     res.send('API a funcionar..');
 });
 
-// Rota que retorna os dados do MQTT
+// Rota para obter os dados dos sensores
 app.get('/api/dados', (req, res) => {
     res.json(sensorData);
 });
 
+// Rota para controlar a luz
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'notiipt', 'dist', 'index.html'));
 });
 
-// Endpoint para publicar o estado do LED
+// Rota para controlar a luz
 app.post('/api/control', (req, res) => {
     const { luzState, autoMode } = req.body;
     if (autoMode !== undefined) {
@@ -97,17 +103,17 @@ app.post('/api/control', (req, res) => {
     res.send(`Modo automático ${autoMode ? 'ativado' : 'desativado'}, LUZ ${luzState}`);
 });
 
-// Inicia o servidor HTTP
+// Inicia o servidor HTTP na porta 3000
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
     console.log(`Servidor HTTP iniciado na porta ${port}`);
 });
 
-// Configura o WebSocket
-io.on('connection', (socket) => {
+// Conexão WebSocket
+wss.on('connection', (ws) => {
     console.log('Novo cliente WebSocket conectado');
 
-    socket.on('disconnect', () => {
+    ws.on('close', () => {
         console.log('Cliente WebSocket desconectado');
     });
 });

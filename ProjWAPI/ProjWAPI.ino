@@ -4,7 +4,6 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <TimeLib.h>
-
 #include "esp_secrets.h"
 
 // Configuração da rede Wi-Fi
@@ -33,15 +32,14 @@ String mqttSubAutoControl = String(topico) + "auto"; // Tópico de automatizaç�
 String mqttSubLuzControl = String(topico) + "luz/controloManual"; // Tópico de Ligar ou Apagar luz manualmente (Ligada ou Apagada)
 
 const char* mqttAutoModeTopic = "sala0/luz/auto-mode"; //********
-const char* mqttLuzTopic = "sala0/luz/controlo";                 //********
+const char* mqttLuzTopic = "sala0/luz/controlo";       //********
 bool autoMode = true;
-
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP,"europe.pool.ntp.org", 3600);
+NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600);
 
 DHT20 DHT;
 
@@ -52,6 +50,9 @@ int ldrValue = 0;   // Variável para armazenar o valor do LDR
 String formattedDate; // Hora formatada
 
 bool luzState = false; // Estado inicial do LED (desligado)
+
+unsigned long lastSensorReadTime = 0; // Variável para temporização
+const unsigned long sensorReadInterval = 10000; // Intervalo de leitura dos sensores em milissegundos
 
 void setup() {
   Serial.begin(115200);
@@ -78,6 +79,9 @@ void setup() {
   // Subscreve aos tópicos MQTT relevantes
   client.subscribe(mqttAutoModeTopic);
   client.subscribe(mqttLuzTopic);
+
+  // Inicialização do NTP
+  timeClient.begin();
 }
 
 void loop() {
@@ -93,9 +97,15 @@ void loop() {
   timeClient.update();
   formattedDate = getCurrentTimeString();  
 
-  Serial.print("\nHora: ");
-  Serial.print(formattedDate);
+  // Verifica se é hora de ler os sensores
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastSensorReadTime >= sensorReadInterval) {
+    lastSensorReadTime = currentMillis;
+    readAndPublishSensorData();
+  }
+}
 
+void readAndPublishSensorData() {
   // Ler dados dos sensores (Remover provoca a não leitura do DHT20)
   uint32_t start = micros();
   int status = DHT.read();
@@ -119,10 +129,7 @@ void loop() {
   Serial.print("Valor lido pelo LDR: ");
   Serial.println(ldrPercentagem);
 
-  Serial.print("DEBUG: ");
-  Serial.println(autoMode);
-  
-// Verifica o estado do modo automático antes de ajustar o LED
+  // Verifica o estado do modo automático antes de ajustar o LED
   if (autoMode) {
     if (ldrPercentagem > 40) {
       digitalWrite(ledPin, LOW); // Apaga o LED
@@ -131,7 +138,6 @@ void loop() {
       digitalWrite(ledPin, HIGH); // Acende o LED
       luzState = true;
     }
-  // Publica os dados do sensor ldr nos tópicos MQTT
   }
 
   // Publica os dados dos sensores nos tópicos MQTT
@@ -141,7 +147,6 @@ void loop() {
   client.publish(mqttPubLuz.c_str(), luzState ? "Ligada" : "Desligada");
   client.publish(mqttPubHora.c_str(), formattedDate.c_str());
   Serial.println("Dados enviados com sucesso para o servidor MQTT");
-  delay(10000); // Delay entre leituras
 }
 
 String getCurrentTimeString() {
@@ -201,28 +206,27 @@ void callback(char* topic, byte* payload, unsigned int length) {
     message += (char)payload[i];
   }
 
-      if (String(topic) == "sala0/luz/auto-mode") {
-        Serial.print("Modo automático: ");
-        if(message == "true"){
-            Serial.println("ativado");
-            autoMode = true;
-        } else {
-            Serial.println("desativado");
-            autoMode = false;
-        }
-      }
-
-    if (String(topic) == "sala0/luz/controlo" && !autoMode) {
-        Serial.print("Luz: ");
-        if(message == "ligar"){
-            Serial.println("Acesa"); //DEBUG
-            digitalWrite(ledPin, HIGH);
-            luzState = true;
-        } else if(message == "desligar"){
-            Serial.println("Apagada"); //DEBUG
-            digitalWrite(ledPin, LOW);
-            luzState = false;
-        }
+  if (String(topic) == mqttAutoModeTopic) {
+    Serial.print("Modo automático: ");
+    if (message == "true") {
+      Serial.println("ativado");
+      autoMode = true;
+    } else {
+      Serial.println("desativado");
+      autoMode = false;
     }
-}
+  }
 
+  if (String(topic) == mqttLuzTopic && !autoMode) {
+    Serial.print("Luz: ");
+    if (message == "ligar") {
+      Serial.println("Acesa");
+      digitalWrite(ledPin, HIGH);
+      luzState = true;
+    } else if (message == "desligar") {
+      Serial.println("Apagada");
+      digitalWrite(ledPin, LOW);
+      luzState = false;
+    }
+  }
+}
