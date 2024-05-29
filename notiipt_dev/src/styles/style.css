@@ -75,6 +75,29 @@
     text-align: left;
 }
 
+.card-GS-dados-light {
+    color: #212636; /* TODO Adaptar ao darkmode */
+    font-size: 1.4em;
+    font-weight: 500;
+    margin: 0px;
+    text-align: left;
+}
+
+.titulo-switch {
+    color: #212636; /* TODO Adaptar ao darkmode */
+    font-size: 2em;
+    font-weight: 500;
+    margin: 0px;
+    text-align: center;
+}
+
+.estado-switch {
+    color: #667085; /* TODO Adaptar ao darkmode */
+    font-size: 1em;
+    margin: 0px;
+    text-align: center;
+}
+
 .card-GS-barra {
     position: relative;
     overflow: hidden;

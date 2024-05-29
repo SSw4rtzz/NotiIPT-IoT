@@ -15,6 +15,9 @@ import {
 import { faSun } from '@fortawesome/free-regular-svg-icons'; // Regular
 import Ipma from '../components/ipma/ipma';
 import Charts from '../components/charts/charts';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/material/styles';
 
 function Gestao() {
     const [temperatura, setTemperatura] = useState(''); // Temperatura da sala
@@ -104,6 +107,59 @@ function Gestao() {
         diferencaHum = humidade - humidadeAnterior;
     }
 
+
+    // Switch 
+    const IOSSwitch = styled((props) => (
+        <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+      ))(({ theme }) => ({
+        width: 42,
+        height: 26,
+        padding: 0,
+        '& .MuiSwitch-switchBase': {
+          padding: 0,
+          margin: 2,
+          transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)', // Adiciona a transição aqui
+          '&.Mui-checked': {
+            transform: 'translateX(16px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#BACD92;',
+              opacity: 1,
+              border: 0,
+            },
+            '&.Mui-disabled + .MuiSwitch-track': {
+              opacity: 0.5,
+            },
+          },
+          '&.Mui-focusVisible .MuiSwitch-thumb': {
+            color: '#33cf4d',
+            border: '6px solid #fff',
+          },
+          '&.Mui-disabled .MuiSwitch-thumb': {
+            color:
+              theme.palette.mode === 'light'
+                ? theme.palette.grey[100]
+                : theme.palette.grey[600],
+          },
+          '&.Mui-disabled + .MuiSwitch-track': {
+            opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
+          },
+        },
+        '& .MuiSwitch-thumb': {
+          boxSizing: 'border-box',
+          width: 22,
+          height: 22,
+        },
+        '& .MuiSwitch-track': {
+          borderRadius: 26 / 2,
+          backgroundColor: theme.palette.mode === 'light' ? '#E9E9EA' : '#39393D',
+          opacity: 1,
+          transition: theme.transitions.create(['background-color'], {
+            duration: 500,
+          }),
+        },
+      }));
+
     return (
         <div className='home'>
             <section className="titulo">
@@ -176,52 +232,47 @@ function Gestao() {
                         </div> {/* TODO Barra de luminosidade */}
                     </div>
                 </div>
-                {luz === 'true' ? (
+                {luz === 'Ligada' ? (
                     <div className='card-GS'>
                         <div className="card-GS-container">
                             <div className="card-GS-container-text">
                                 <span className="card-GS-titulo">Luz</span>
-                                <h4 className="card-GS-dados">Acesa</h4> {/* Mostra estado da luz da sala */}
+                                <h4 className="card-GS-dados">Ligada</h4> {/* Mostra estado da luz da sala */}
                             </div>
-                            <i className='card-GS-icon'><FontAwesomeIcon icon={faLightbulb} style={{ color: "#F6F193" }} /></i>
+                            <i className='card-GS-icon'><FontAwesomeIcon icon={faLightbulb} style={{ color: "#ffd42b" }} /></i>
                         </div>
-                        <span className="card-GS-btn">Apagar</span>
+                        <button className="card-GS-btn" onClick={() => handleLuzControl('desligar')} disabled={autoMode}>Desligar</button>
                     </div>
                 ) : (
                     <div className='card-GS'>
                         <div className="card-GS-container">
                             <div className="card-GS-container-text">
                                 <span className="card-GS-titulo">Luz</span>
-                                <h4 className="card-GS-dados">{luz}</h4> {/* Mostra estado da luz da sala */}
+                                {luz === 'ligar' ? (
+                                    <h4 className="card-GS-dados">A ligar</h4>
+                                ) : luz === 'desligar' ?(
+                                    <h4 className="card-GS-dados-light">A desligar</h4>
+                                ) : (
+                                    <h4 className="card-GS-dados">Desligada</h4>
+                                )}
                             </div>
                             <i className='card-GS-icon'><FontAwesomeIcon icon={faLightbulb} /></i>
                         </div>
-                        <span className="card-GS-btn">Acender</span>
+
+                        <button className="card-GS-btn" onClick={() => handleLuzControl('ligar')} disabled={autoMode}>Ligar</button>
                     </div>
                 )}
-
-                <div>
-                    <div>
-                        <label>
-                            Modo Automático: {luzState}
-                            <input type="checkbox" checked={autoMode} onChange={handleAutoModeToggle} />
-                        </label>
-                    </div>
-                    {luz === 'Ligada' ? (
-                        <div>
-                            <h4>Luz: Acesa</h4>
-                            <FontAwesomeIcon icon={faLightbulb} style={{ color: "#ffd42b" }} />
-                            <button onClick={() => handleLuzControl('desligar')} disabled={autoMode}>Desligar</button>
-                        </div>
-                    ) : (
-                        <div>
-                            <h4>Luz: Apagada</h4>
-                            <FontAwesomeIcon icon={faLightbulb} />
-                            <button onClick={() => handleLuzControl('ligar')} disabled={autoMode}>Acender</button>
-                        </div>
-                    )}
-                </div>
             </section>
+
+            <h4 className='titulo-switch'>Modo Automático</h4>
+
+            <FormControlLabel
+                sx={{ m: 0 }}
+                control={<IOSSwitch sx={{ m: 1 }} checked={autoMode} onChange={handleAutoModeToggle} />}
+            />
+            <div className='estado-switch'> {`${autoMode ? 'Ativo' : 'Desligado'}`}</div>
+
+
             <section className="grid-GS">
                 <Charts />
             </section>
