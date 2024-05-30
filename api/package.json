@@ -10,7 +10,9 @@
   "author": "Ruben & Tiago",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.2",
     "basic-auth": "^2.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-oauth-server": "^2.0.0",

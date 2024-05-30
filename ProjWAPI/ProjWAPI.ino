@@ -11,7 +11,7 @@ const char* ssid = SECRET_SSID;
 const char* password = SECRET_PASS;
 
 // Configuração do broker MQTT
-const char* mqtt_server = "192.168.137.247"; // Ip da máquina
+const char* mqtt_server = "192.168.137.244"; // Ip da máquina
 const int mqtt_port = 1883;
 
 // Configuração das credenciais do MQTT
@@ -31,9 +31,14 @@ String mqttPubHora = String(topico) + "hora";
 String mqttSubAutoControl = String(topico) + "auto"; // Tópico de automatização (Ativado ou Desligado)
 String mqttSubLuzControl = String(topico) + "luz/controloManual"; // Tópico de Ligar ou Apagar luz manualmente (Ligada ou Apagada)
 
-const char* mqttAutoModeTopic = "sala0/luz/auto-mode"; //********
-const char* mqttLuzTopic = "sala0/luz/controlo";       //********
+const char* mqttAutoModeTopic = "sala0/luz/auto-mode"; // Tópico para modo automático
+const char* mqttLuzTopic = "sala0/luz/controlo";       // Tópico para controle manual
+const char* mqttLuzOnLimiteTopic = "sala0/limite/luzOnLimite"; // Tópico para limite de acender a luz
+const char* mqttLuzOffLimiteTopic = "sala0/limite/luzOffLimite"; // Tópico para limite de apagar a luz
+
 bool autoMode = true;
+int luzOnLimite;  // Limite padrão para acender a luz
+int luzOffLimite; // Limite padrão para apagar a luz
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -65,20 +70,21 @@ void setup() {
   }
   Serial.println("Ligação ao WiFi estabelecida.");
 
-  pinMode(ldrPin, INPUT);    // Define ldrPin como saída
+  pinMode(ldrPin, INPUT);    // Define ldrPin como entrada
   pinMode(ledPin, OUTPUT);   // Define o pino do LED como saída
 
-  Wire.begin();   // Ativa o protocolo I2C, necessário para o sensor DHT20
-  DHT.begin();    // ESP32 default pins 21 22
+  Wire.begin();   // Ativa o protocolo I2C
+  DHT.begin();    // Ativa o DHT20
 
-  // Inicialização do MQTT
+  // Inicializa a conexão ao broker MQTT
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
-  reconnect();
 
-  // Subscreve aos tópicos MQTT relevantes
+  // Subscreve aos tópicos MQTT necessários
   client.subscribe(mqttAutoModeTopic);
   client.subscribe(mqttLuzTopic);
+  client.subscribe(mqttLuzOnLimiteTopic);
+  client.subscribe(mqttLuzOffLimiteTopic);
 
   // Inicialização do NTP
   timeClient.begin();
@@ -131,10 +137,10 @@ void readAndPublishSensorData() {
 
   // Verifica o estado do modo automático antes de ajustar o LED
   if (autoMode) {
-    if (ldrPercentagem > 40) {
+    if (ldrPercentagem > luzOffLimite) {
       digitalWrite(ledPin, LOW); // Apaga o LED
       luzState = false;
-    } else if (ldrPercentagem < 35) {
+    } else if (ldrPercentagem < luzOnLimite) {
       digitalWrite(ledPin, HIGH); // Acende o LED
       luzState = true;
     }
@@ -191,6 +197,10 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str(), mqttuser, mqttpass)) {
       Serial.println("Reconectado com sucesso ao broker MQTT.");
+      client.subscribe(mqttAutoModeTopic);
+      client.subscribe(mqttLuzTopic);
+      client.subscribe(mqttLuzOnLimiteTopic);
+      client.subscribe(mqttLuzOffLimiteTopic);
     } else {
       Serial.print("Falha na reconexão ao broker MQTT, estado: ");
       Serial.print(client.state());
@@ -205,6 +215,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (unsigned int i = 0; i < length; i++) {
     message += (char)payload[i];
   }
+
+  Serial.print("Mensagem recebida no tópico ");
+  Serial.print(topic);
+  Serial.print(": ");
+  Serial.println(message);
 
   if (String(topic) == mqttAutoModeTopic) {
     Serial.print("Modo automático: ");
@@ -228,5 +243,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
       digitalWrite(ledPin, LOW);
       luzState = false;
     }
+  }
+
+  if (String(topic) == mqttLuzOnLimiteTopic) {
+    luzOnLimite = message.toInt();
+    Serial.print("Novo limiar para acender a luz: ");
+    Serial.println(luzOnLimite);
+  }
+
+  if (String(topic) == mqttLuzOffLimiteTopic) {
+    luzOffLimite = message.toInt();
+    Serial.print("Novo limiar para apagar a luz: ");
+    Serial.println(luzOffLimite);
   }
 }

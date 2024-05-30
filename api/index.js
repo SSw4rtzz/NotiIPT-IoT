@@ -2,10 +2,12 @@ require('dotenv').config({ path: 'secrets.env' });
 
 const express = require('express');
 const mqtt = require('mqtt');
+const axios = require('axios');
 const http = require('http');
 const WebSocket = require('ws');
 const basicAuth = require('basic-auth');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
@@ -14,7 +16,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Middleware para permitir CORS
-const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
@@ -90,6 +91,33 @@ app.get('/api/dados', (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'notiipt', 'dist', 'index.html'));
 });
+
+// Função para adquirir dados do IPMA e ajustar os limites do LDR dada a produção de energia atual do País
+const fetchLimitarLDR = async () => {
+    try {
+        const response = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json');
+        const weatherData = response.data.data[0];
+        const weatherId = weatherData.idWeatherType;
+
+        let luzOnLimite = 35;
+        let luzOffLimite = 45;
+
+        if (weatherId === 1) { // Céu limpo
+            luzOnLimite = 45;
+            luzOffLimite = 55;
+        }
+
+        // Publica os novos limiares para o broker MQTT
+        mqttClient.publish('sala0/limite/luzOnLimite', luzOnLimite.toString());
+        mqttClient.publish('sala0/limite/luzOffLimite', luzOffLimite.toString());
+    } catch (error) {
+        console.error('Erro ao adquirir dados do IPMA:', error);
+    }
+};
+
+// Agendar a função para executar a cada hora
+setInterval(fetchLimitarLDR, 30000);
+fetchLimitarLDR();
 
 // Rota para controlar a luz
 app.post('/api/control', (req, res) => {
