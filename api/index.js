@@ -92,7 +92,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'notiipt', 'dist', 'index.html'));
 });
 
-// Função para adquirir dados do IPMA e ajustar os limites do LDR dada a produção de energia atual do País
+// Adquire dados do IPMA e ajustar os limites do LDR dada a produção de energia atual do País
 const fetchLimitarLDR = async () => {
     try {
         const response = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json');

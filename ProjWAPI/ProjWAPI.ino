@@ -11,7 +11,7 @@ const char* ssid = SECRET_SSID;
 const char* password = SECRET_PASS;
 
 // Configuração do broker MQTT
-const char* mqtt_server = "192.168.137.244"; // Ip da máquina
+const char* mqtt_server = "192.168.137.1"; // Ip da máquina
 const int mqtt_port = 1883;
 
 // Configuração das credenciais do MQTT
@@ -28,9 +28,6 @@ String mqttPubLuz = String(topico) + "luz/estado";
 String mqttPubHora = String(topico) + "hora";
 
 // Sub-tópicos MQTT para receber os dados do Front-End (SUBSCRIBERS)
-String mqttSubAutoControl = String(topico) + "auto"; // Tópico de automatização (Ativado ou Desligado)
-String mqttSubLuzControl = String(topico) + "luz/controloManual"; // Tópico de Ligar ou Apagar luz manualmente (Ligada ou Apagada)
-
 const char* mqttAutoModeTopic = "sala0/luz/auto-mode"; // Tópico para modo automático
 const char* mqttLuzTopic = "sala0/luz/controlo";       // Tópico para controle manual
 const char* mqttLuzOnLimiteTopic = "sala0/limite/luzOnLimite"; // Tópico para limite de acender a luz
