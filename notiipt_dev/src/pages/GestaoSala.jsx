@@ -108,7 +108,7 @@ function Gestao() {
     }
 
 
-    // Switch 
+    // Switch MUI
     const IOSSwitch = styled((props) => (
         <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
       ))(({ theme }) => ({
