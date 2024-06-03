@@ -40,7 +40,7 @@ function checkAuth(req, res, next) {
     }
     next();
 }
-app.use(checkAuth);
+//app.use(checkAuth);
 
 // Configuração do cliente MQTT
 const mqttBrokerUrl = 'mqtt://mqtt:1883';
@@ -81,6 +81,9 @@ app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
 app.get('/test', (req, res) => {
     res.send('API a funcionar..');
 });
+
+// Aplica o middleware de autenticação apenas às rotas da API
+app.use('/api', checkAuth);
 
 // Rota para obter os dados dos sensores
 app.get('/api/dados', (req, res) => {
