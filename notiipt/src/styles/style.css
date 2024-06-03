@@ -3,7 +3,6 @@
 
 /* Google Font Import - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 @import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
 
 *{
@@ -76,6 +75,29 @@
     text-align: left;
 }
 
+.card-GS-dados-light {
+    color: #212636; /* TODO Adaptar ao darkmode */
+    font-size: 1.4em;
+    font-weight: 500;
+    margin: 0px;
+    text-align: left;
+}
+
+.titulo-switch {
+    color: #212636; /* TODO Adaptar ao darkmode */
+    font-size: 2em;
+    font-weight: 500;
+    margin: 0px;
+    text-align: center;
+}
+
+.estado-switch {
+    color: #667085; /* TODO Adaptar ao darkmode */
+    font-size: 1em;
+    margin: 0px;
+    text-align: center;
+}
+
 .card-GS-barra {
     position: relative;
     overflow: hidden;
@@ -96,7 +118,7 @@
   }
 
   .card-GS-lampada {
-    position:fixed;
+    position:absolute;
     width: 10%; /* Nível de luminosidade onde a lâmpada acende (30%) */
     color: #000;
     font-size: 1.5em;
@@ -165,6 +187,11 @@
 
 .card-GS-btn:active {
     background-color: #3a4552; /* TODO Adaptar ao darkmode */
+}
+
+/* CHARTS */
+.chart.card-GS {
+    width: 42%;
 }
 
 /* EXTERIOR */
