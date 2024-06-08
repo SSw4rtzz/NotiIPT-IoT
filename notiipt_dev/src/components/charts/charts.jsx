@@ -1,5 +1,3 @@
-import { width } from '@fortawesome/free-brands-svg-icons/fa42Group';
-import { colors } from '@mui/material';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 
@@ -10,10 +8,10 @@ class Charts extends React.Component {
         this.state = {
             seriesArea: [{
                 name: 'Temperatura de Hoje',
-                data: [22, 25, 23, 24, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20]
-                }, {
+                data: [] // Inicialmente vazio, será preenchido com os dados da API
+            }, {
                 name: 'Temperatura de Ontem',
-                data: [21, 24, 22, 23, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 28, 27, 26, 25, 24, 23, 22, 21, 20, 22]
+                data: [] // Inicialmente vazio, será preenchido com os dados da API
             }],
             optionsArea: {
                 chart: {
@@ -32,7 +30,7 @@ class Charts extends React.Component {
                 },
                 xaxis: {
                     type: 'datetime',
-                    categories: ['2021-09-01T00:00:00', '2021-09-01T01:30:00', '2021-09-01T02:30:00', '2021-09-01T03:30:00', '2021-09-01T04:30:00', '2021-09-01T05:30:00', '2021-09-01T06:30:00', '2021-09-01T07:30:00', '2021-09-01T08:30:00', '2021-09-01T09:30:00', '2021-09-01T10:30:00', '2021-09-01T11:30:00', '2021-09-01T12:30:00', '2021-09-01T13:30:00', '2021-09-01T14:30:00', '2021-09-01T15:30:00', '2021-09-01T16:30:00', '2021-09-01T17:30:00', '2021-09-01T18:30:00', '2021-09-01T19:30:00', '2021-09-01T20:30:00', '2021-09-01T21:30:00', '2021-09-01T22:30:00', '2021-09-01T23:30:00'],
+                    categories: [], // Inicialmente vazio, será preenchido com os dados da API
                 },
                 tooltip: {
                     x: {
@@ -40,7 +38,7 @@ class Charts extends React.Component {
                     },
                 },
             },
-            seriesRadial: [70, 30], // [Energia, Energia Mês Passado]
+            seriesRadial: [70, 30], // [Energia Mês Atual, Energia Mês Passado]
             optionsRadial: {
                 chart: {
                     type: 'radialBar',
@@ -57,9 +55,9 @@ class Charts extends React.Component {
                             },
                             total: {
                                 show: true,
-                                label: 'Luz',
+                                label: 'Tempo de luz',
                                 formatter: function () {
-                                    return 'Acesa'
+                                    return 'Acesa';
                                 }
                             }
                         },
@@ -68,24 +66,125 @@ class Charts extends React.Component {
                         },
                     }
                 },
-                labels: ['Energia','Energia Mês Passado'],
+                labels: ['Mês Atual', 'Mês Passado'],
             },
         };
     }
+
+    componentDidMount() {
+        this.fetchApiData();
+    }
+
+    fetchApiData = async () => {
+        try {
+            const response = await fetch('https://localhost:7027/api/dados');
+            const data = await response.json();
+
+            const hoje = [];
+            const ontem = [];
+            const categorias = [];
+            let luzLigadaContagemAtual = 0;
+            let totalMesAtual = 0;
+            let luzLigadaContagemPassado = 0;
+            let totalMesPassado = 0;
+
+            const agora = new Date();
+            const mesAtual = agora.getMonth();
+            const mesPassado = new Date(agora.getFullYear(), agora.getMonth() - 1);
+
+            data.forEach((item, index) => {
+                const dataHora = new Date(item.dataHora);
+                const diaAtual = agora.getDate();
+                const diaDoItem = dataHora.getDate();
+                const mesDoItem = dataHora.getMonth();
+                const anoDoItem = dataHora.getFullYear();
+
+                if (diaDoItem === diaAtual) {
+                    hoje.push(item.temperatura);
+                } else if (diaDoItem === diaAtual - 1) {
+                    ontem.push(item.temperatura);
+                }
+
+                // Contagem para o mês atual
+                if (anoDoItem === agora.getFullYear() && mesDoItem === mesAtual) {
+                    totalMesAtual++;
+                    if (item.luz === "ligada") {
+                        luzLigadaContagemAtual++;
+                    }
+                }
+
+                // Contagem para o mês passado
+                if (anoDoItem === mesPassado.getFullYear() && mesDoItem === mesPassado.getMonth()) {
+                    totalMesPassado++;
+                    if (item.luz === "ligada") {
+                        luzLigadaContagemPassado++;
+                    }
+                }
+
+                if (index === 0) {
+                    categorias.push(item.dataHora);
+                }
+            });
+
+            const percentagemLuzLigadaAtual = (luzLigadaContagemAtual / totalMesAtual) * 100;
+            const percentagemLuzLigadaPassado = (luzLigadaContagemPassado / totalMesPassado) * 100;
+
+            this.setState({
+                seriesArea: [
+                    {
+                        name: 'Temperatura de Hoje',
+                        data: hoje
+                    },
+                    {
+                        name: 'Temperatura de Ontem',
+                        data: ontem
+                    }
+                ],
+                optionsArea: {
+                    ...this.state.optionsArea,
+                    xaxis: {
+                        ...this.state.optionsArea.xaxis,
+                        categories: categorias
+                    }
+                },
+                seriesRadial: [percentagemLuzLigadaAtual, percentagemLuzLigadaPassado], // [Energia Mês Atual, Energia Mês Passado]
+                optionsRadial: {
+                    ...this.state.optionsRadial,
+                    plotOptions: {
+                        ...this.state.optionsRadial.plotOptions,
+                        radialBar: {
+                            ...this.state.optionsRadial.plotOptions.radialBar,
+                            dataLabels: {
+                                ...this.state.optionsRadial.plotOptions.radialBar.dataLabels,
+                                total: {
+                                    ...this.state.optionsRadial.plotOptions.radialBar.dataLabels.total,
+                                    formatter: function () {
+                                        return luzLigadaContagemAtual > 0 ? 'Acesa' : 'Apagada';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao procurar dados da API:', error);
+        }
+    };
 
     render() {
         return (
             <>
                 <div className='chart card-GS'>
                     <div className="card-GS-container">
-                        <div id="chart1" style={{width: '100%'}}>
-                            <ReactApexChart options={this.state.optionsArea} series={this.state.seriesArea} type="area" height={350}/>
+                        <div id="chart1" style={{ width: '100%' }}>
+                            <ReactApexChart options={this.state.optionsArea} series={this.state.seriesArea} type="area" height={350} />
                         </div>
                     </div>
                 </div>
                 <div className='chart card-GS'>
                     <div className="card-GS-container">
-                        <div id="chart2" style={{width: '100%'}}>
+                        <div id="chart2" style={{ width: '100%' }}>
                             <ReactApexChart options={this.state.optionsRadial} series={this.state.seriesRadial} type="radialBar" height={350} />
                         </div>
                     </div>

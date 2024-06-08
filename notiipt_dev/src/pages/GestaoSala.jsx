@@ -31,37 +31,52 @@ function Gestao() {
     const [autoMode, setAutoMode] = useState(true); //! Modo automático inicialmente ativado Mudar isto
 
     useEffect(() => {
+        const fetchApiData = async () => {
+            try {
+                const response = await fetch('https://localhost:7027/api/dados');
+                const data = await response.json();
+    
+                setHumidadeAnterior(data[1].humidade);
+                setTemperaturaAnterior(data[1].temperatura);
+    
+            } catch (error) {
+                console.error('Erro ao buscar dados da API:', error);
+            }
+        };
+    
+        fetchApiData(); // Chamada inicial
+    
+        const interval = setInterval(fetchApiData, 60000); // Chamar a cada 60 segundos
+    
         const ws = new WebSocket('ws://localhost:3000');
-
+    
         ws.onopen = () => {
             console.log('Conectado ao servidor WebSocket');
         };
-
+    
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log('Dados recebidos via WebSocket:', data);
-
+    
             // Atualiza o estado com os novos dados
             setTemperatura(data.temperatura);
             setHumidade(data.humidade);
             setLuminosidade(data.ldr);
             setLuz(data.luz);
-
-            // ! setTemperaturaAnterior(data[1].temperatura); DEPENDE da BASE DE DADOS
-            // ! setHumidadeAnterior(data[1].humidade); DEPENDE da BASE DE DADOS
         };
-
+    
         ws.onclose = () => {
             console.log('Desconectado do servidor WebSocket');
         };
-
+    
         ws.onerror = (error) => {
             console.error('Erro no WebSocket:', error);
         };
-
+    
         // Limpeza na desmontagem do componente
         return () => {
             ws.close();
+            clearInterval(interval);
         };
     }, []);
 
@@ -71,6 +86,7 @@ function Gestao() {
         const headers = new Headers();
         headers.set('Authorization', 'Basic ' + btoa(`${username}:${password}`));
         headers.set('Content-Type', 'application/json');
+
         try {
             const response = await fetch(`http://localhost:3000/api/control`, {
                 method: 'POST',
@@ -263,7 +279,6 @@ function Gestao() {
                     </div>
                 )}
             </section>
-
             <h4 className='titulo-switch'>Modo Automático</h4>
 
             <FormControlLabel
