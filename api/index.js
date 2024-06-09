@@ -75,13 +75,13 @@ mqttClient.on('message', (topic, message) => {
 
     // Converte e envia os dados para a API
     const formattedData = formatSensorData(sensorData);
-    //sendToApi(formattedData);
+    sendToApi(formattedData);
 });
 
 // Função para formatar os dados do sensor
 const formatSensorData = (data) => {
     console.log(
-        'Data:', new Date(data.hora).toISOString(),
+        'Data:', data.hora,
         'Temperatura:', parseFloat(data.temperatura),
         'Humidade:', parseFloat(data.humidade),
         'lumino:', parseFloat(data.ldr),
@@ -89,7 +89,7 @@ const formatSensorData = (data) => {
     );
 
     return {
-        dataHora: new Date(data.hora).toISOString(),
+        dataHora: data.hora,
         temperatura: parseFloat(data.temperatura),
         humidade: parseFloat(data.humidade),
         lumino: data.ldr,
@@ -98,14 +98,14 @@ const formatSensorData = (data) => {
 };
 
 // Função para enviar dados para a API
-/*const sendToApi = async (data) => {
+const sendToApi = async (data) => {
     try {
         await axios.post('https://localhost:7027/api/dados', data);
         console.log('Dados enviados para a API com sucesso');
     } catch (error) {
         console.error('Erro ao enviar dados para a API:', error);
     }
-};*/
+};
 
 // Middleware para servir a aplicação React
 app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
