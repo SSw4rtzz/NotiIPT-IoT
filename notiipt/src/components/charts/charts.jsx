@@ -1,3 +1,5 @@
+import { width } from '@fortawesome/free-brands-svg-icons/fa42Group';
+import { colors } from '@mui/material';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 

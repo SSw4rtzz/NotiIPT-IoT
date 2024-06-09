@@ -4,7 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faDroplet,
+import {
+    faDroplet,
     faLightbulb,
+    faTemperatureThreeQuarters,
+    faTemperatureArrowUp,
+    faTemperatureArrowDown,
+    faArrowUp,
+    faArrowDown,
     faTemperatureThreeQuarters,
     faTemperatureArrowUp,
     faTemperatureArrowDown,
@@ -13,7 +20,12 @@ import {
     faGripLinesVertical
 } from '@fortawesome/free-solid-svg-icons'; // Solid
 import { faSun } from '@fortawesome/free-regular-svg-icons'; // Regular
+import { faSun } from '@fortawesome/free-regular-svg-icons'; // Regular
 import Ipma from '../components/ipma/ipma';
+import Charts from '../components/charts/charts';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/material/styles';
 import Charts from '../components/charts/charts';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -27,6 +39,58 @@ function Gestao() {
     const [luminosidade, setLuminosidade] = useState(''); // Luminosidade da sala
     const [luz, setLuz] = useState(''); // Estado da luz da sala
 
+    const [luzState, setLuzState] = useState('');
+    const [autoMode, setAutoMode] = useState(true); //! Modo automático inicialmente ativado Mudar isto
+
+    useEffect(() => {
+        const ws = new WebSocket('ws://localhost:3000');
+
+        ws.onopen = () => {
+            console.log('Conectado ao servidor WebSocket');
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('Dados recebidos via WebSocket:', data);
+
+            // Atualiza o estado com os novos dados
+            setTemperatura(data.temperatura);
+            setHumidade(data.humidade);
+            setLuminosidade(data.ldr);
+            setLuz(data.luz);
+
+            // ! setTemperaturaAnterior(data[1].temperatura); DEPENDE da BASE DE DADOS
+            // ! setHumidadeAnterior(data[1].humidade); DEPENDE da BASE DE DADOS
+        };
+
+        ws.onclose = () => {
+            console.log('Desconectado do servidor WebSocket');
+        };
+
+        ws.onerror = (error) => {
+            console.error('Erro no WebSocket:', error);
+        };
+
+        // Limpeza na desmontagem do componente
+        return () => {
+            ws.close();
+        };
+    }, []);
+
+    const handleControl = async (state, autoMode) => {
+        const username = 'user1'; // !!!!!!!!!
+        const password = 'user1';
+        const headers = new Headers();
+        headers.set('Authorization', 'Basic ' + btoa(`${username}:${password}`));
+        headers.set('Content-Type', 'application/json');
+        try {
+            const response = await fetch(`http://localhost:3000/api/control`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ luzState: state, autoMode: autoMode })
+            });
+            const result = await response.text();
+            console.log(result);
     const [luzState, setLuzState] = useState('');
     const [autoMode, setAutoMode] = useState(true); //! Modo automático inicialmente ativado Mudar isto
 
