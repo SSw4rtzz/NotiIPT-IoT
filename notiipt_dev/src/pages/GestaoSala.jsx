@@ -117,10 +117,10 @@ function Gestao() {
     let diferencaHum = 0;
 
     if (temperaturaAnterior !== '') {
-        diferencaTemp = temperatura - temperaturaAnterior;
+        diferencaTemp = parseFloat((temperatura - temperaturaAnterior).toFixed(3));
     }
     if (humidadeAnterior !== '') {
-        diferencaHum = humidade - humidadeAnterior;
+        diferencaHum = parseFloat((humidade - humidadeAnterior).toFixed(3));
     }
 
 

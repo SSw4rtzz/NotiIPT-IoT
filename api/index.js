@@ -12,7 +12,7 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 
- // Cria um servidor WebSocket
+// Cria um servidor WebSocket
 const wss = new WebSocket.Server({ server });
 
 // Middleware para permitir CORS
@@ -40,7 +40,7 @@ function checkAuth(req, res, next) {
     }
     next();
 }
-//app.use(checkAuth);
+app.use(checkAuth);
 
 // Configuração do cliente MQTT
 const mqttBrokerUrl = 'mqtt://mqtt:1883';
@@ -72,7 +72,40 @@ mqttClient.on('message', (topic, message) => {
             client.send(JSON.stringify(sensorData));
         }
     });
+
+    // Converte e envia os dados para a API
+    const formattedData = formatSensorData(sensorData);
+    //sendToApi(formattedData);
 });
+
+// Função para formatar os dados do sensor
+const formatSensorData = (data) => {
+    console.log(
+        'Data:', new Date(data.hora).toISOString(),
+        'Temperatura:', parseFloat(data.temperatura),
+        'Humidade:', parseFloat(data.humidade),
+        'lumino:', parseFloat(data.ldr),
+        'Luz:', data.luz
+    );
+
+    return {
+        dataHora: new Date(data.hora).toISOString(),
+        temperatura: parseFloat(data.temperatura),
+        humidade: parseFloat(data.humidade),
+        lumino: data.ldr,
+        luz: data.luz
+    };
+};
+
+// Função para enviar dados para a API
+/*const sendToApi = async (data) => {
+    try {
+        await axios.post('https://localhost:7027/api/dados', data);
+        console.log('Dados enviados para a API com sucesso');
+    } catch (error) {
+        console.error('Erro ao enviar dados para a API:', error);
+    }
+};*/
 
 // Middleware para servir a aplicação React
 app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
@@ -81,9 +114,6 @@ app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
 app.get('/test', (req, res) => {
     res.send('API a funcionar..');
 });
-
-// Aplica o middleware de autenticação apenas às rotas da API
-app.use('/api', checkAuth);
 
 // Rota para obter os dados dos sensores
 app.get('/api/dados', (req, res) => {
@@ -95,7 +125,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'notiipt', 'dist', 'index.html'));
 });
 
-// Função para adquirir dados do IPMA e ajustar os limites do LDR dada a produção de energia atual do País
+// Adquire dados do IPMA e ajustar os limites do LDR dada a produção de energia atual do País
 const fetchLimitarLDR = async () => {
     try {
         const response = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json');
