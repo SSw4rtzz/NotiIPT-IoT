@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import './styles/style.css'
 
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/side-adminbar/side-adminbar.jsx';
 
 // Importa páginas
@@ -19,6 +19,7 @@ function App() {
         <Route path="/teste" element={<TestPage />} />
         <Route path="/lorem" element={<LoremPage />} />
         <Route path="/gestaosala" element={<GestaoSala />} />
+        <Route path="/" element={<Navigate to="/gestaosala" />} />
       </Routes>
     </div>
     );

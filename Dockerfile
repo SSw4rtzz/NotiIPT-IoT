@@ -21,7 +21,7 @@ RUN npm run build
 WORKDIR /usr/src/app
 
 # Expor a porta da aplicação
-EXPOSE 3000
+EXPOSE 8080
 
 # Iniciar o servidor Express para servir o front-end e a API
 CMD ["node", "index.js"]

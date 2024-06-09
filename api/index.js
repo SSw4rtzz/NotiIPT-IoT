@@ -165,7 +165,7 @@ app.post('/api/control', (req, res) => {
 });
 
 // Inicia o servidor HTTP na porta 3000
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 server.listen(port, () => {
     console.log(`Servidor HTTP iniciado na porta ${port}`);
 });

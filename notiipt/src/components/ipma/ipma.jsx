@@ -18,7 +18,7 @@ const Ipma = () => {
   // API IPMA - Tipo de Tempo
   const fetchValues = async () => {
     try {
-      const tempoAPI = await fetch('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json'); // Santarém - 1141600
+      const tempoAPI = await fetch('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json'); // Santarém - 1141600
       const dataTempo = await tempoAPI.json();
       setTemperaturaMax(dataTempo.data[0].tMax);
       setTemperaturaMin(dataTempo.data[0].tMin);

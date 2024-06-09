@@ -15,6 +15,17 @@ services:
     container_name: API
     build: .
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       - mqtt
+
+  ngrok:
+    image: wernight/ngrok
+    container_name: Ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_AUTHTOKEN=2fEv0LbCp9hnUWjs5KqmSN8zRg1_4ijkCaaHqd7LV7qLQjvju
+    depends_on:
+      - api
+    command: "ngrok http --domain=needed-deep-racer.ngrok-free.app api:8080"
