@@ -11,7 +11,7 @@ const char* ssid = SECRET_SSID;
 const char* password = SECRET_PASS;
 
 // Configuração do broker MQTT
-const char* mqtt_server = "192.168.137.244"; // Ip da máquina
+const char* mqtt_server = "192.168.137.1"; // Ip da máquina
 const int mqtt_port = 1883;
 
 // Configuração das credenciais do MQTT
@@ -28,9 +28,6 @@ String mqttPubLuz = String(topico) + "luz/estado";
 String mqttPubHora = String(topico) + "hora";
 
 // Sub-tópicos MQTT para receber os dados do Front-End (SUBSCRIBERS)
-String mqttSubAutoControl = String(topico) + "auto"; // Tópico de automatização (Ativado ou Desligado)
-String mqttSubLuzControl = String(topico) + "luz/controloManual"; // Tópico de Ligar ou Apagar luz manualmente (Ligada ou Apagada)
-
 const char* mqttAutoModeTopic = "sala0/luz/auto-mode"; // Tópico para modo automático
 const char* mqttLuzTopic = "sala0/luz/controlo";       // Tópico para controle manual
 const char* mqttLuzOnLimiteTopic = "sala0/limite/luzOnLimite"; // Tópico para limite de acender a luz
@@ -57,7 +54,9 @@ String formattedDate; // Hora formatada
 bool luzState = false; // Estado inicial do LED (desligado)
 
 unsigned long lastSensorReadTime = 0; // Variável para temporização
+unsigned long lastTimeUpdate = 0;
 const unsigned long sensorReadInterval = 10000; // Intervalo de leitura dos sensores em milissegundos
+const unsigned long timeUpdateInterval = 10000;
 
 void setup() {
   Serial.begin(115200);
@@ -100,11 +99,14 @@ void loop() {
   client.loop();
 
   // Obtem a hora atual formatada
-  timeClient.update();
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastTimeUpdate >= timeUpdateInterval) {
+    lastTimeUpdate = currentMillis;
+    timeClient.update();
+  }
   formattedDate = getCurrentTimeString();  
 
   // Verifica se é hora de ler os sensores
-  unsigned long currentMillis = millis();
   if (currentMillis - lastSensorReadTime >= sensorReadInterval) {
     lastSensorReadTime = currentMillis;
     readAndPublishSensorData();
@@ -156,28 +158,13 @@ void readAndPublishSensorData() {
 }
 
 String getCurrentTimeString() {
-  // Recebe a hora atual
-  time_t currentTime = timeClient.getEpochTime();
+  // Obtem a hora atual em segundos desde 1970-01-01
+  time_t now = time(nullptr);
 
-  // Recebe os valores da hora atual separadamente
-  int currentHour = hour(currentTime);
-  int currentMinute = minute(currentTime);
-  int currentSecond = second(currentTime);
-
-  // Recebe a data atual
-  int currentDay = day(currentTime);
-  int currentWeekday = weekday(currentTime);
-  int currentMonth = month(currentTime);
-  int currentYear = year(currentTime);
-
-  // Formata a hora atual para string
-  String formattedString = String(currentYear) + "-" +
-                           getTwoDigitString(currentMonth) + "-" +
-                           getTwoDigitString(currentDay) + " " +
-                           getTwoDigitString(currentHour) + ":" +
-                           getTwoDigitString(currentMinute) + ":" +
-                           getTwoDigitString(currentSecond) + "";
-  return formattedString;
+  // Formata a hora para 2024-06-08T00:00:00
+  char formattedString[20];
+  strftime(formattedString, sizeof(formattedString), "%Y-%m-%dT%H:%M:%S", localtime(&now));
+  return String(formattedString);
 }
 
 // Função para formatar um número de um dígito para dois dígitos com zero à esquerda
@@ -257,3 +244,4 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(luzOffLimite);
   }
 }
+
