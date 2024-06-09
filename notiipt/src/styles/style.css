@@ -189,6 +189,12 @@
     background-color: #3a4552; /* TODO Adaptar ao darkmode */
 }
 
+.card-GS-btn:disabled {
+    background-color: #d1d5d9;
+    color: #667085;
+    cursor: not-allowed;
+}
+
 /* CHARTS */
 .chart.card-GS {
     width: 42%;

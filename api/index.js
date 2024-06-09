@@ -12,7 +12,7 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 
- // Cria um servidor WebSocket
+// Cria um servidor WebSocket
 const wss = new WebSocket.Server({ server });
 
 // Middleware para permitir CORS
@@ -72,7 +72,40 @@ mqttClient.on('message', (topic, message) => {
             client.send(JSON.stringify(sensorData));
         }
     });
+
+    // Converte e envia os dados para a API
+    const formattedData = formatSensorData(sensorData);
+    //sendToApi(formattedData);
 });
+
+// Função para formatar os dados do sensor
+const formatSensorData = (data) => {
+    console.log(
+        'Data:', new Date(data.hora).toISOString(),
+        'Temperatura:', parseFloat(data.temperatura),
+        'Humidade:', parseFloat(data.humidade),
+        'lumino:', parseFloat(data.ldr),
+        'Luz:', data.luz
+    );
+
+    return {
+        dataHora: new Date(data.hora).toISOString(),
+        temperatura: parseFloat(data.temperatura),
+        humidade: parseFloat(data.humidade),
+        lumino: data.ldr,
+        luz: data.luz
+    };
+};
+
+// Função para enviar dados para a API
+/*const sendToApi = async (data) => {
+    try {
+        await axios.post('https://localhost:7027/api/dados', data);
+        console.log('Dados enviados para a API com sucesso');
+    } catch (error) {
+        console.error('Erro ao enviar dados para a API:', error);
+    }
+};*/
 
 // Middleware para servir a aplicação React
 app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
@@ -132,7 +165,7 @@ app.post('/api/control', (req, res) => {
 });
 
 // Inicia o servidor HTTP na porta 3000
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 server.listen(port, () => {
     console.log(`Servidor HTTP iniciado na porta ${port}`);
 });
