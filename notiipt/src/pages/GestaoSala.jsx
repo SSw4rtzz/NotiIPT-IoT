@@ -4,14 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faDroplet,
-import {
-    faDroplet,
     faLightbulb,
-    faTemperatureThreeQuarters,
-    faTemperatureArrowUp,
-    faTemperatureArrowDown,
-    faArrowUp,
-    faArrowDown,
     faTemperatureThreeQuarters,
     faTemperatureArrowUp,
     faTemperatureArrowDown,
@@ -20,12 +13,7 @@ import {
     faGripLinesVertical
 } from '@fortawesome/free-solid-svg-icons'; // Solid
 import { faSun } from '@fortawesome/free-regular-svg-icons'; // Regular
-import { faSun } from '@fortawesome/free-regular-svg-icons'; // Regular
 import Ipma from '../components/ipma/ipma';
-import Charts from '../components/charts/charts';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import { styled } from '@mui/material/styles';
 import Charts from '../components/charts/charts';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -43,61 +31,9 @@ function Gestao() {
     const [autoMode, setAutoMode] = useState(true); //! Modo automático inicialmente ativado Mudar isto
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:3000');
-
-        ws.onopen = () => {
-            console.log('Conectado ao servidor WebSocket');
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('Dados recebidos via WebSocket:', data);
-
-            // Atualiza o estado com os novos dados
-            setTemperatura(data.temperatura);
-            setHumidade(data.humidade);
-            setLuminosidade(data.ldr);
-            setLuz(data.luz);
-
-            // ! setTemperaturaAnterior(data[1].temperatura); DEPENDE da BASE DE DADOS
-            // ! setHumidadeAnterior(data[1].humidade); DEPENDE da BASE DE DADOS
-        };
-
-        ws.onclose = () => {
-            console.log('Desconectado do servidor WebSocket');
-        };
-
-        ws.onerror = (error) => {
-            console.error('Erro no WebSocket:', error);
-        };
-
-        // Limpeza na desmontagem do componente
-        return () => {
-            ws.close();
-        };
-    }, []);
-
-    const handleControl = async (state, autoMode) => {
-        const username = 'user1'; // !!!!!!!!!
-        const password = 'user1';
-        const headers = new Headers();
-        headers.set('Authorization', 'Basic ' + btoa(`${username}:${password}`));
-        headers.set('Content-Type', 'application/json');
-        try {
-            const response = await fetch(`http://localhost:3000/api/control`, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({ luzState: state, autoMode: autoMode })
-            });
-            const result = await response.text();
-            console.log(result);
-    const [luzState, setLuzState] = useState('');
-    const [autoMode, setAutoMode] = useState(true); //! Modo automático inicialmente ativado Mudar isto
-
-    useEffect(() => {
         const fetchApiData = async () => {
             try {
-                const response = await fetch('https://localhost:7027/api/dados');
+                const response = await fetch('https://572f-194-210-240-64.ngrok-free.app/api/dados');
                 const data = await response.json();
     
                 setHumidadeAnterior(data[1].humidade);
@@ -112,7 +48,7 @@ function Gestao() {
     
         const interval = setInterval(fetchApiData, 60000); // Chamar a cada 60 segundos
     
-        const ws = new WebSocket('ws://localhost:8080');
+        const ws = new WebSocket('wss://needed-deep-racer.ngrok-free.app:8080');
     
         ws.onopen = () => {
             console.log('Conectado ao servidor WebSocket');
@@ -152,7 +88,7 @@ function Gestao() {
         headers.set('Content-Type', 'application/json');
 
         try {
-            const response = await fetch(`http://localhost:8080/api/control`, {
+            const response = await fetch(`https://needed-deep-racer.ngrok-free.app:8080/api/control`, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({ luzState: state, autoMode: autoMode })
@@ -360,6 +296,6 @@ function Gestao() {
             </section>
         </div>
     );
-}
+};
 
 export default Gestao;

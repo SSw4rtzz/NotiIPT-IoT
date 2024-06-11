@@ -75,7 +75,7 @@ mqttClient.on('message', (topic, message) => {
 
     // Converte e envia os dados para a API
     const formattedData = formatSensorData(sensorData);
-    sendToApi(formattedData);
+    sendToApi(dados);
 });
 
 // Função para formatar os dados do sensor
@@ -84,7 +84,7 @@ const formatSensorData = (data) => {
         'Data:', data.hora,
         'Temperatura:', parseFloat(data.temperatura),
         'Humidade:', parseFloat(data.humidade),
-        'lumino:', parseFloat(data.ldr),
+        'lumino:', parseInt(data.ldr),
         'Luz:', data.luz
     );
 
@@ -92,20 +92,43 @@ const formatSensorData = (data) => {
         dataHora: data.hora,
         temperatura: parseFloat(data.temperatura),
         humidade: parseFloat(data.humidade),
-        lumino: data.ldr,
+        lumino: parseInt(data.ldr),
         luz: data.luz
     };
 };
 
 // Função para enviar dados para a API
-const sendToApi = async (data) => {
+/*const sendToApi = async (data) => {
     try {
-        await axios.post('https://localhost:7027/api/dados', data);
+        await axios.post('https://127.0.0.1:7027/api/dados', data,{
+            headers: {'Content-Type':'application/json'}
+        });
         console.log('Dados enviados para a API com sucesso');
     } catch (error) {
-        console.error('Erro ao enviar dados para a API:', error);
+        console.error('Erro ao enviar dados para a API:', data, error);
+    }
+};*/
+
+const sendToApi = async (data) => {
+    try {
+        await fetch('https://127.0.0.1:7027/api/dados',{
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        }).then(response => response.json());
+        console.log('Dados enviados para a API com sucesso');
+    } catch (error) {
     }
 };
+
+const dados = {
+    dataHora: '2024-06-11T16:58:01',
+    temperatura: 26.6,
+    humidade: 50.3,
+    lumino: 49,
+    luz: 'Desligada'
+};
+
 
 // Middleware para servir a aplicação React
 app.use(express.static(path.join(__dirname, 'notiipt', 'dist')));
@@ -128,7 +151,7 @@ app.get('*', (req, res) => {
 // Adquire dados do IPMA e ajustar os limites do LDR dada a produção de energia atual do País
 const fetchLimitarLDR = async () => {
     try {
-        const response = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json');
+        const response = await axios.get('https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1141600.json');
         const weatherData = response.data.data[0];
         const weatherId = weatherData.idWeatherType;
 
