@@ -49,8 +49,6 @@ const int ldrPin = 34; // Pino do LDR
 const int ledPin = 2;  // Pino do LED
 int ldrValue = 0;   // Variável para armazenar o valor do LDR
 
-String formattedDate; // Hora formatada
-
 bool luzState = false; // Estado inicial do LED (desligado)
 
 unsigned long lastSensorReadTime = 0; // Variável para temporização
@@ -87,6 +85,7 @@ void setup() {
 
   // Inicialização do NTP
   timeClient.begin();
+  timeClient.forceUpdate();  // Força uma atualização do NTP no início
 }
 
 void loop() {
@@ -102,9 +101,8 @@ void loop() {
   unsigned long currentMillis = millis();
   if (currentMillis - lastTimeUpdate >= timeUpdateInterval) {
     lastTimeUpdate = currentMillis;
-    timeClient.update();
+    getCurrentTimeString();
   }
-  formattedDate = getCurrentTimeString();  
 
   // Verifica se é hora de ler os sensores
   if (currentMillis - lastSensorReadTime >= sensorReadInterval) {
@@ -153,18 +151,36 @@ void readAndPublishSensorData() {
   client.publish(mqttPubHumidade.c_str(), String(humidity, 1).c_str());
   client.publish(mqttPubLdr.c_str(), String(ldrPercentagem).c_str());
   client.publish(mqttPubLuz.c_str(), luzState ? "Ligada" : "Desligada");
-  client.publish(mqttPubHora.c_str(), formattedDate.c_str());
+  client.publish(mqttPubHora.c_str(), getCurrentTimeString().c_str());
   Serial.println("Dados enviados com sucesso para o servidor MQTT");
 }
 
 String getCurrentTimeString() {
-  // Obtem a hora atual em segundos desde 1970-01-01
-  time_t now = time(nullptr);
+  // Recebe a hora atual
+  time_t currentTime = timeClient.getEpochTime();
 
-  // Formata a hora para 2024-06-08T00:00:00
-  char formattedString[20];
-  strftime(formattedString, sizeof(formattedString), "%Y-%m-%dT%H:%M:%S", localtime(&now));
-  return String(formattedString);
+  // Recebe os valores da hora atual separadamente
+  int currentHour = hour(currentTime);
+  int currentMinute = minute(currentTime);
+  int currentSecond = second(currentTime);
+
+  // Recebe a data atual
+  int currentDay = day(currentTime);
+  int currentWeekday = weekday(currentTime);
+  int currentMonth = month(currentTime);
+  int currentYear = year(currentTime);
+
+  // Formata a hora atual para string
+String formattedString = String(currentYear) + "-" +
+                           getTwoDigitString(currentMonth) + "-" +
+                           getTwoDigitString(currentDay) + "T" +
+                           getTwoDigitString(currentHour) + ":" +
+                           getTwoDigitString(currentMinute) + ":" +
+                           getTwoDigitString(currentSecond);
+  
+  Serial.print("\nHora: ");
+  Serial.println(formattedString);
+  return formattedString;
 }
 
 // Função para formatar um número de um dígito para dois dígitos com zero à esquerda
@@ -244,4 +260,3 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(luzOffLimite);
   }
 }
-
