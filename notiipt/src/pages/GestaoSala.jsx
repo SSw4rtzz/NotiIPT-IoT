@@ -29,18 +29,20 @@ function Gestao() {
 
     const [luzState, setLuzState] = useState('');
     const [autoMode, setAutoMode] = useState(true); //! Modo automático inicialmente ativado Mudar isto
+    let teste;
 
     useEffect(() => {
         const fetchApiData = async () => {
             try {
                 const response = await fetch('https://572f-194-210-240-64.ngrok-free.app/api/dados');
                 const data = await response.json();
-    
+                teste=data;
+
                 setHumidadeAnterior(data[1].humidade);
                 setTemperaturaAnterior(data[1].temperatura);
     
             } catch (error) {
-                console.error('Erro ao buscar dados da API:', error);
+                console.error('Erro ao procurar dados da API:', teste, error);
             }
         };
     
@@ -48,7 +50,7 @@ function Gestao() {
     
         const interval = setInterval(fetchApiData, 60000); // Chamar a cada 60 segundos
     
-        const ws = new WebSocket('wss://needed-deep-racer.ngrok-free.app:8080');
+        const ws = new WebSocket('wss://needed-deep-racer.ngrok-free.app');
     
         ws.onopen = () => {
             console.log('Conectado ao servidor WebSocket');
@@ -88,7 +90,7 @@ function Gestao() {
         headers.set('Content-Type', 'application/json');
 
         try {
-            const response = await fetch(`https://needed-deep-racer.ngrok-free.app:8080/api/control`, {
+            const response = await fetch(`https://needed-deep-racer.ngrok-free.app/api/control`, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({ luzState: state, autoMode: autoMode })

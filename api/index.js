@@ -75,7 +75,7 @@ mqttClient.on('message', (topic, message) => {
 
     // Converte e envia os dados para a API
     const formattedData = formatSensorData(sensorData);
-    sendToApi(dados);
+    sendToApi(formattedData);
 });
 
 // Função para formatar os dados do sensor
@@ -111,7 +111,7 @@ const formatSensorData = (data) => {
 
 const sendToApi = async (data) => {
     try {
-        await fetch('https://127.0.0.1:7027/api/dados',{
+        await fetch('https://572f-194-210-240-64.ngrok-free.app/api/dados',{
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(data)
@@ -122,7 +122,7 @@ const sendToApi = async (data) => {
 };
 
 const dados = {
-    dataHora: '2024-06-11T16:58:01',
+    dataHora: '2024-06-11 16:58:01',
     temperatura: 26.6,
     humidade: 50.3,
     lumino: 49,

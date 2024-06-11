@@ -79,7 +79,7 @@ class Charts extends React.Component {
 
     fetchApiData = async () => {
         try {
-            const response = await fetch('https://localhost:7027/api/dados');
+            const response = await fetch('https://572f-194-210-240-64.ngrok-free.app/api/dados');
             const data = await response.json();
 
             const hoje = [];
@@ -100,7 +100,7 @@ class Charts extends React.Component {
                 const diaDoItem = dataHora.getDate();
                 const mesDoItem = dataHora.getMonth();
                 const anoDoItem = dataHora.getFullYear();
-
+                
                 if (diaDoItem === diaAtual) {
                     hoje.push(item.temperatura);
                 } else if (diaDoItem === diaAtual - 1) {
@@ -126,6 +126,7 @@ class Charts extends React.Component {
                 if (index === 0) {
                     categorias.push(item.dataHora);
                 }
+
             });
 
             const percentagemLuzLigadaAtual = (luzLigadaContagemAtual / totalMesAtual) * 100;
